@@ -1,0 +1,21 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>mapperTest</title>
+</head>
+<body>
+    <h1>mapperTest</h1>
+    <table>
+        <tr>
+            <th>부서 번호</th>
+            <th>부서 이름</th>
+            <th>부서 위치</th>
+        </tr>
+        <tr th:each="department : ${list}">
+            <td th:text="${department.dno}">id</td>
+            <td th:text="${department.dname}">name</td>
+            <td th:text="${department.loc}">name</td>
+        </tr>
+    </table>
+</body>
+</html>
