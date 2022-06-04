@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springbootstudybasictest.mapper.HREmployeeMapper">
+    <select id="selectHREmployeeList" parameterType="com.example.springbootstudybasictest.util.PageObject" resultType="HREmployeeVO">
+        SELECT ROW_NUMBER() OVER(ORDER BY A.FIRST_NAME ASC, A.LAST_NAME ASC) ROW_NUM,
+               (SELECT COUNT(*) FROM EMPLOYEES) AS TOTAL_COUNT,
+               A.EMPLOYEE_ID,
+               A.FIRST_NAME,
+               A.LAST_NAME,
+               A.EMAIL,
+               REPLACE(A.PHONE_NUMBER, '.', '-') AS PHONE_NUMBER,
+               TO_CHAR(A.HIRE_DATE, 'YYYY.MM.DD') AS HIRE_DATE,
+               A.JOB_ID,
+               A.SALARY,
+               A.COMMISSION_PCT,
+               A.MANAGER_ID,
+               A.DEPARTMENT_ID
+        FROM EMPLOYEES A
+        OFFSET #{startRow}-1 ROW FETCH FIRST #{perPageRow} ROWS ONLY
+    </select>
+    <select id="HREmployeeTotCnt" resultType="Integer">
+        SELECT COUNT(*) AS CNT
+        FROM EMPLOYEES
+    </select>
+</mapper>
