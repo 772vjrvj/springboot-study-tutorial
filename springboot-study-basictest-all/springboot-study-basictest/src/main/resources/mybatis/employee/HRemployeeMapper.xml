@@ -1,25 +1,196 @@
 <?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.springbootstudybasictest.mapper.HREmployeeMapper">
-    <select id="selectHREmployeeList" parameterType="com.example.springbootstudybasictest.util.PageObject" resultType="HREmployeeVO">
-        SELECT ROW_NUMBER() OVER(ORDER BY A.FIRST_NAME ASC, A.LAST_NAME ASC) ROW_NUM,
-               (SELECT COUNT(*) FROM EMPLOYEES) AS TOTAL_COUNT,
-               A.EMPLOYEE_ID,
-               A.FIRST_NAME,
-               A.LAST_NAME,
-               A.EMAIL,
-               REPLACE(A.PHONE_NUMBER, '.', '-') AS PHONE_NUMBER,
-               TO_CHAR(A.HIRE_DATE, 'YYYY.MM.DD') AS HIRE_DATE,
-               A.JOB_ID,
-               A.SALARY,
-               A.COMMISSION_PCT,
-               A.MANAGER_ID,
-               A.DEPARTMENT_ID
-        FROM EMPLOYEES A
-        OFFSET #{startRow}-1 ROW FETCH FIRST #{perPageRow} ROWS ONLY
+    <!-- 다중 검색 조회 조건 -->
+    <sql id="multiSearch">
+        <bind name="employeeId" value="'%'+hrEmployeeVO.employeeId+'%'"/>
+        <bind name="firstName" value="'%'+hrEmployeeVO.firstName+'%'"/>
+        <bind name="lastName" value="'%'+hrEmployeeVO.lastName+'%'"/>
+        <bind name="email" value="'%'+hrEmployeeVO.email+'%'"/>
+        <bind name="phoneNumber" value="'%'+hrEmployeeVO.phoneNumber+'%'"/>
+        <bind name="hireDate" value="'%'+hrEmployeeVO.hireDate+'%'"/>
+        <bind name="jobId" value="'%'+hrEmployeeVO.jobId+'%'"/>
+        <bind name="managerId" value="'%'+hrEmployeeVO.managerId+'%'"/>
+        <bind name="departmentId" value="'%'+hrEmployeeVO.departmentId+'%'"/>
+        <bind name="departmentName" value="'%'+hrEmployeeVO.departmentName+'%'"/>
+        <bind name="managerFirstName" value="'%'+hrEmployeeVO.managerFirstName+'%'"/>
+        <bind name="managerLastName" value="'%'+hrEmployeeVO.managerLastName+'%'"/>
+        <if test="employeeId !=null and employeeId != ''">
+            AND E.EMPLOYEE_ID LIKE #{employeeId}
+        </if>
+        <if test="firstName !=null and firstName != ''">
+            AND E.FIRST_NAME LIKE #{firstName}
+        </if>
+        <if test="lastName !=null and lastName != ''">
+            AND E.LAST_NAME LIKE #{lastName}
+        </if>
+        <if test="email !=null and email != ''">
+            AND E.EMAIL LIKE #{email}
+        </if>
+        <if test="phoneNumber !=null and phoneNumber != ''">
+            AND E.PHONE_NUMBER LIKE #{phoneNumber}
+        </if>
+        <if test="hireDate !=null and hireDate != ''">
+            AND E.HIRE_DATE LIKE #{hireDate}
+        </if>
+        <if test="jobId !=null and jobId != ''">
+            AND E.JOB_ID LIKE #{jobId}
+        </if>
+        <if test="hrEmployeeVO.salary != null and hrEmployeeVO.salary != -1">
+            AND E.SALARY = #{hrEmployeeVO.salary}
+        </if>
+        <if test="hrEmployeeVO.commissionPct !=null and hrEmployeeVO.commissionPct != -1.0">
+            AND E.COMMISSION_PCT = #{hrEmployeeVO.commissionPct}
+        </if>
+        <if test="managerId != null and managerId != ''">
+            AND E.MANAGER_ID LIKE #{managerId}
+        </if>
+        <if test="departmentId != null and departmentId != ''">
+            AND E.DEPARTMENT_ID LIKE #{departmentId}
+        </if>
+        <if test="departmentName != null and departmentName != ''">
+            AND D.DEPARTMENT_NAME LIKE #{departmentName}
+        </if>
+        <if test="managerFirstName != null and managerFirstName != ''">
+            AND M.FIRST_NAME LIKE #{managerFirstName}
+        </if>
+        <if test="managerLastName != null and managerLastName != ''">
+            AND M.LAST_NAME LIKE #{managerLastName}
+        </if>
+    </sql>
+
+    <!-- 싱글 검색 조회 조건 -->
+    <sql id="singleSearch">
+        <if test="value !=null and value != ''.toString">
+        <!-- 2글자 이상인 경우 : String 취급, 한 글자인 경우:char 취급 => toString()를 이용해서 문자열(string)로 -->
+            <if test="key == 'employeeId'">
+                AND E.EMPLOYEE_ID LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'firstName'">
+                AND E.FIRST_NAME LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'lastName'">
+                AND E.LAST_NAME LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'email'">
+                AND E.EMAIL LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'phoneNumber'">
+                AND E.PHONE_NUMBER LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'hireDate'">
+                AND E.HIRE_DATE LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'jobId'">
+                AND E.JOB_ID LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'salary'">
+                AND E.SALARY = #{value}
+            </if>
+            <if test="key == 'commissionPct'">
+                AND E.COMMISSION_PCT = #{value}
+            </if>
+            <if test="key == 'managerId'">
+                AND E.MANAGER_ID LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'departmentId'">
+                AND E.DEPARTMENT_ID LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'departmentName'">
+                AND D.DEPARTMENT_NAME LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'managerFirstName'">
+                AND M.FIRST_NAME LIKE '%' || #{value} || '%'
+            </if>
+            <if test="key == 'managerLastName'">
+                AND M.LAST_NAME LIKE '%' || #{value} || '%'
+            </if>
+        </if>
+    </sql>
+
+    <!-- 싱글 검색 -->
+    <select id="HREmployeeList" resultType="HREmployeeVO">
+        SELECT ROW_NUMBER() OVER(ORDER BY E.FIRST_NAME ASC, E.LAST_NAME ASC) ROW_NUM,
+        E.EMPLOYEE_ID,
+        E.FIRST_NAME ,
+        E.LAST_NAME,
+        E.EMAIL,
+        REPLACE(E.PHONE_NUMBER, '.', '-') AS PHONE_NUMBER,
+        TO_CHAR(E.HIRE_DATE, 'YYYY.MM.DD') AS HIRE_DATE,
+        E.JOB_ID,
+        E.SALARY,
+        E.COMMISSION_PCT,
+        E.MANAGER_ID,
+        M.FIRST_NAME AS MANAGER_FIRST_NAME,
+        M.LAST_NAME AS MANAGER_LAST_NAME,
+        E.DEPARTMENT_ID,
+        D.DEPARTMENT_NAME
+        FROM EMPLOYEES E, EMPLOYEES M, DEPARTMENTS D
+        WHERE 1=1
+        AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
+        AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
+        <include refid="singleSearch" />
+        <include refid="common.sql.pageOffset"/>
     </select>
-    <select id="HREmployeeTotCnt" resultType="Integer">
-        SELECT COUNT(*) AS CNT
-        FROM EMPLOYEES
+
+    <!-- 싱글 count -->
+    <select id="HREmployeeTotCnt" parameterType="HashMap" resultType="Integer">
+        SELECT COUNT(*) AS TOTAL_COUNT
+        FROM EMPLOYEES E, EMPLOYEES M, DEPARTMENTS D
+        WHERE 1=1
+        AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
+        AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
+        <include refid="singleSearch" />
     </select>
+
+    <!-- 다중 검색 list -->
+    <select id="HREmployeeMultiSearchList" parameterType="HashMap" resultType="HREmployeeVO">
+        SELECT ROW_NUMBER() OVER(ORDER BY E.FIRST_NAME ASC, E.LAST_NAME ASC) ROW_NUM,
+               E.EMPLOYEE_ID,
+               E.FIRST_NAME ,
+               E.LAST_NAME,
+               E.EMAIL,
+               REPLACE(E.PHONE_NUMBER, '.', '-') AS PHONE_NUMBER,
+               TO_CHAR(E.HIRE_DATE, 'YYYY.MM.DD') AS HIRE_DATE,
+               E.JOB_ID,
+               E.SALARY,
+               E.COMMISSION_PCT,
+               E.MANAGER_ID,
+               M.FIRST_NAME AS MANAGER_FIRST_NAME,
+               M.LAST_NAME AS MANAGER_LAST_NAME,
+               E.DEPARTMENT_ID,
+               D.DEPARTMENT_NAME
+        FROM EMPLOYEES E, EMPLOYEES M, DEPARTMENTS D
+        WHERE 1=1
+          AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
+          AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
+        <include refid="multiSearch" />
+        <include refid="common.sql.pageOffset"/>
+    </select>
+
+    <!-- 다중 검색 total count -->
+    <select id="HREmployeeMultiSearchTotCnt" parameterType="HashMap" resultType="Integer">
+        SELECT COUNT(*) AS TOTAL_COUNT
+        FROM EMPLOYEES E, EMPLOYEES M, DEPARTMENTS D
+        WHERE 1=1
+        AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
+        AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
+        <include refid="multiSearch" />
+    </select>
+
+    <!-- 전체 컬럼 list -->
+    <select id="HREmployeeColumnList" resultType="map">
+        SELECT
+            SUBSTR(REPLACE(INITCAP('1' || COLUMN_NAME), '_'), 2) as key,
+            REPLACE(COLUMN_NAME,'_',' ') as value
+        FROM ALL_TAB_COLUMNS
+        WHERE TABLE_NAME = 'EMPLOYEES'
+        UNION ALL
+        SELECT 'managerFirstName' as key, 'MANAGER FIRST NAME' as value FROM DUAL
+        UNION ALL
+        SELECT 'managerLastName' as key, 'MANAGER LAST NAME' as value FROM DUAL
+        UNION ALL
+        SELECT 'departmentName' as key, 'DEPARTMENT NAME' as value  FROM DUAL
+    </select>
+
 </mapper>

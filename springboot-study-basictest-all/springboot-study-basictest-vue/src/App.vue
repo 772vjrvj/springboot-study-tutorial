@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <HREmployeeList />
+    <BootVueHREmployeeList />
   </div>
 </template>
 
 <script>
-import HREmployeeList from './components/HREmployeeList.vue'
+import BootVueHREmployeeList from './components/BootVueHREmployeeList.vue'
 
 export default {
   name: 'App',
   components: {
-    HREmployeeList
+    BootVueHREmployeeList
   }
 }
 </script>

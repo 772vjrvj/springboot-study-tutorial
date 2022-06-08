@@ -2,73 +2,80 @@
   <div class = "container">
     <h3 class="text-center mb-lg-4"> Employees List </h3>
     <div class="row justify-content-between">
-      <div class="col-2">
-        <select v-model="selectedPerRow" @change="selectRowChange" class="form-select form-select-md mb-sm-3" aria-label="Default select example">
+      <div class="col-auto">
+        <select v-model="selectedPerRow" @change="selectRowChange" class="form-select form-select-md mb-3" aria-label="Default select example">
           <option v-for="(val, idx) in rowCountList" v-bind:key="idx" v-bind:value="val">{{val === 0 ? 'Row Count' : val}}</option>
         </select>
       </div>
-      <div class="col-3 ms-auto">
-        <select class="form-select form-select-md mb-sm-3" aria-label="Default select example">
-          <option selected value="id">ID</option>
-          <option value="firstName">First Name</option>
-          <option value="lastName">Last Name</option>
-          <option value="email" >Email</option>
-          <option value="phoneNumber">Phone Number</option>
-          <option value="hireDate">Hire Date</option>
-          <option value="jobId">Job ID</option>
-          <option value="salary">Salary</option>
-          <option value="commissionPct">Commission Pct</option>
-          <option value="managerId">Manager ID</option>
-          <option value="departmentId">Department ID</option>
-        </select>
+      <div class="col-auto">
+        <div class="pt-1"><span>Total Row : {{this.pageObject.totalRow}}</span></div>
       </div>
-      <div class="col-3 ps-0">
+      <div class="col-auto">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                data-bs-target="#exampleModal">Etc. Search</button>
+      </div>
+      <div class="col-auto">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Input your contents" aria-label="Recipient's username" aria-describedby="button-addon2">
-          <button class="btn btn-secondary" type="button" id="button-addon2">Button</button>
+          <select v-model="selectEmpCol" @change="searchChange" class="form-select form-select-md" aria-label="Default select example">
+            <option v-for="(val, idx) in empColList" v-bind:key="idx" v-bind:value="val.KEY">{{val.VALUE}}</option>
+          </select>
+          <input v-model="searchInput" type="text" class="form-control" placeholder="Input your contents"
+                 :disabled="selectEmpCol === 'search'"
+                 aria-label="Recipient's username" aria-describedby="button-addon2"
+                 @keyup.enter="searchEmpCol"
+          >
+          <button :disabled="selectEmpCol === 'search'" @click="searchEmpCol" class="btn btn-secondary" type="button" id="button-addon2">Go</button>
         </div>
       </div>
     </div>
-    <table class="table table-striped">
-      <thead>
-      <th> No </th>
-      <th> ID </th>
-      <th> First Name </th>
-      <th> Last Name </th>
-      <th> Email </th>
-      <th> Phone Number </th>
-      <th> Hire Date </th>
-      <th> Job ID </th>
-      <th> Salary </th>
-      <th> Commission Pct </th>
-      <th> Manager ID </th>
-      <th> Department ID </th>
-      </thead>
-      <tbody>
-      <tr v-for = "employee in employees" v-bind:key = "employee.id">
-        <td> {{employee.rowNum}} </td>
-        <td> {{employee.employeeId}} </td>
-        <td> {{employee.firstName}} </td>
-        <td> {{employee.lastName}} </td>
-        <td> {{employee.email}} </td>
-        <td> {{employee.phoneNumber}} </td>
-        <td> {{employee.hireDate}} </td>
-        <td> {{employee.jobId}} </td>
-        <td> {{employee.salary}} </td>
-        <td> {{employee.commissionPct}} </td>
-        <td> {{employee.managerId}} </td>
-        <td> {{employee.departmentId}} </td>
-      </tr>
-      </tbody>
-    </table>
-    <div class="row justify-content-evenly">
-      <div class="col-2 pe-0">
-        <select v-model="selectedPerPage" @change="selectPageChange" class="form-select form-select-md mb-sm-3" aria-label="Default select example">
+    <div class="table-responsive">
+      <table class="table table-striped" >
+        <thead>
+        <th> No </th>
+        <th> ID </th>
+        <th> First Name </th>
+        <th> Last Name </th>
+        <th> Email </th>
+        <th> Phone Number </th>
+        <th> Hire Date </th>
+        <th> Job ID </th>
+        <th> Salary </th>
+        <th> Commission Pct </th>
+        <th> Manager ID </th>
+        <th> Manager First Name </th>
+        <th> Manager Last Name </th>
+        <th> Department ID </th>
+        <th> Department Name </th>
+        </thead>
+        <tbody>
+        <tr v-for = "employee in employees" v-bind:key = "employee.id">
+          <td> {{employee.rowNum}} </td>
+          <td> {{employee.employeeId}} </td>
+          <td> {{employee.firstName}} </td>
+          <td> {{employee.lastName}} </td>
+          <td> {{employee.email}} </td>
+          <td> {{employee.phoneNumber}} </td>
+          <td> {{employee.hireDate}} </td>
+          <td> {{employee.jobId}} </td>
+          <td> {{employee.salary === -1 ? 0 : employee.salary}} </td>
+          <td> {{employee.commissionPct === -1 ? '-' : employee.commissionPct}} </td>
+          <td> {{employee.managerId}} </td>
+          <td> {{employee.managerFirstName}} </td>
+          <td> {{employee.managerLastName}} </td>
+          <td> {{employee.departmentId}} </td>
+          <td> {{employee.departmentName}} </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-auto">
+        <select v-model="selectedPerPage" @change="selectPageChange" class="form-select form-select-md mb-3" aria-label="Default select example">
           <option v-for="(val,idx) in pageCountList" v-bind:key="idx" v-bind:value="val">{{val === 0 ? 'Page Row':val}}</option>
         </select>
       </div>
-      <div class="col-4 pe-0 ps-0">
-        <nav aria-label="Page navigation example">
+      <div class="col-auto">
+        <nav aria-label="Page navigation example mb-3">
           <ul class="pagination justify-content-center pagination-md">
             <li class="page-item" v-bind:class="{disabled: !pageObject.firstPage}"
                 @click="getHREmployees(pageObject.firstPage ? 1 : null)"
@@ -113,10 +120,10 @@
           </ul>
         </nav>
       </div>
-      <div class="col-2 ps-0">
-        <div class="input-group mb-3 w-50">
-          <input type="text" v-model="inputPage" class="form-control" placeholder="Page" aria-label="Recipient's username" aria-describedby="button-addon2">
-          <button class="btn btn-secondary btn-sm"  @click="onInputPage" type="button" id="button-addon3">GO</button>
+      <div class="col-auto">
+        <div class="input-group mb-3">
+          <input type="text" style="width: 70px" v-model="inputPage" @keyup.enter="onInputPage" class="form-control" placeholder="Page" aria-label="Recipient's username" aria-describedby="button-addon2">
+          <button class="btn btn-secondary btn-sm" @click="onInputPage" type="button" id="button-addon3">GO</button>
         </div>
       </div>
     </div>
@@ -132,7 +139,7 @@ export default {
     return {
       employees : [],
       selectedPerRow : 0,
-      rowCountList : [0, 10, 20, 30, 50, 100],
+      rowCountList : [0, 5, 10, 20, 30, 50, 100],
       selectedPerPage : 0,
       pageCountList : [0, 5, 10],
       inputPage: '',
@@ -150,14 +157,17 @@ export default {
         nextPage: false,
         firstPage: false,
         lastPage: false,
-      }
+      },
+      empColList: [{VALUE:'Search', KEY:'search' }],
+      selectEmpCol:'search',
+      searchInput:'',
     }
   },
   methods: {
     getHREmployees(page = 1){
       if(page){
         this.pageObject.page = page;
-        HREmployeeService.getHREmployees(page, this.pageObject.perPageRow, this.pageObject.perGroupPage).then((response) => {
+        HREmployeeService.getHREmployees(page, this.pageObject.perPageRow, this.pageObject.perGroupPage, this.selectEmpCol, this.searchInput).then((response) => {
           // if(response && response.data){
           //   this.employees = response.data.employeeList;
           //   this.pageObject = response.data.pageObject;
@@ -195,18 +205,46 @@ export default {
     },
     onInputPage(){
       if(this.inputPage){
-        const page = Number(this.inputPage);
+        const page = Number(this.inputPage.trim());
         if(!Number.isNaN(page) && page > 0){
-          const perPage = page > this.pageObject.totalPage? this.pageObject.totalPage : page;
+          const perPage = page > this.pageObject.totalPage ? this.pageObject.totalPage : page;
           this.getHREmployees(perPage);
+          this.inputPage = perPage;
         }else{
-          alert('숫자가 아닙니다.');
+          alert('유효한 값이 아닙니다.');
         }
+      }
+    },
+    getHREmplColList(){
+      HREmployeeService.getHREmplColList().then((res) => {
+        if(res && res.data){
+          this.empColList = this.empColList.concat(res.data);
+        }
+      })
+    },
+    searchChange(){
+      if(this.selectEmpCol === 'search'){
+        this.searchInput = '';
+        this.getHREmployees(1);                      // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+      }
+    },
+    searchEmpCol(){
+      if(this.selectEmpCol && this.searchInput){
+        if(this.selectEmpCol === 'managerId' || this.selectEmpCol ===  'employeeId' || this.selectEmpCol === 'commissionPct'
+           || this.selectEmpCol === 'salary' ||this.selectEmpCol === 'departmentId'){
+          const searchInput =  Number(this.searchInput);
+          if(Number.isNaN(searchInput)){
+            alert('숫자를 입력하세요.');
+            return;
+          }
+        }
+        this.getHREmployees(1);
       }
     }
   },
   created() {
-    this.getHREmployees()
+    this.getHREmplColList();
+    this.getHREmployees();
   }
 }
 </script>

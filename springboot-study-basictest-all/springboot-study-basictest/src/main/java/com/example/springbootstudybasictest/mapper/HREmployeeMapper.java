@@ -5,11 +5,17 @@ import com.example.springbootstudybasictest.vo.HREmployeeVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Repository
 @Mapper
 public interface HREmployeeMapper {
-    List<HREmployeeVO> selectHREmployeeList(PageObject pageObject);
-    int HREmployeeTotCnt();
+    int HREmployeeTotCnt(HashMap paramObj);
+    List<HREmployeeVO> HREmployeeList(HashMap paramObj);
+
+    int HREmployeeMultiSearchTotCnt(HashMap paramObj);
+    List<HREmployeeVO> HREmployeeMultiSearchList(HashMap paramObj);
+
+    List<HashMap<String, String>> HREmployeeColumnList();
 }

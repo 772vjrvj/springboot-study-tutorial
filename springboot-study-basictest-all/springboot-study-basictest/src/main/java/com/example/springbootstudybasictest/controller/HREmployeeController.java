@@ -24,11 +24,25 @@ public class HREmployeeController {
     //public List<HREmployeeVO> getHREmployeeList(@RequestParam(required = true) Integer page, @RequestParam(required = true) Integer perPageRow, @RequestParam(required = true) Integer perGroupPage)
     //public List<HREmployeeVO> getHREmployeeList(@RequestParam Integer page, @RequestParam Integer perPageRow, @RequestParam Integer perGroupPage)
     //public HashMap<String, Object> getHREmployeeList(int page , int perPageRow, int perGroupPage)
-    public List<HREmployeeVO> getHREmployeeList(PageObject pageObject)
+    public List<HREmployeeVO> getHREmployeeList(PageObject pageObject, String key, String value)
     {
-
-        //PageObject pageObject = new PageObject(page, perPageRow, perGroupPage);
-        List<HREmployeeVO> employeeList = hrEmployeeService.selectHREmployeeList(pageObject);
+        List<HREmployeeVO> employeeList = hrEmployeeService.HREmployeeList(pageObject, key, value);
         return employeeList;
+    }
+
+    //다중 검색
+    @GetMapping("/multiSearch/employees")
+    public List<HREmployeeVO> getHRMultiSearchEmployeeList(PageObject pageObject, HREmployeeVO hrEmployeeVO)
+    {
+        List<HREmployeeVO> employeeList = hrEmployeeService.HREmployeeMultiSearchList(pageObject, hrEmployeeVO);
+        return employeeList;
+    }
+    
+    @GetMapping("/empColList")
+    public List<HashMap<String, String>> getHREmployeeColumnList()
+    {
+        List<HashMap<String, String>> empColList = hrEmployeeService.HREmployeeColumnList();
+        System.out.println("empColList "+ empColList);
+        return empColList;
     }
 }
