@@ -1,16 +1,18 @@
 <template>
   <div id="app">
-    <BootVueHREmployeeList />
+    <GantTest />
   </div>
 </template>
 
 <script>
-import BootVueHREmployeeList from './components/BootVueHREmployeeList.vue'
+// import BootVueHREmployeeList from './components/BootVueHREmployeeList.vue'
+import GantTest from './components/GantTest.vue'
 
 export default {
   name: 'App',
   components: {
-    BootVueHREmployeeList
+    // BootVueHREmployeeList,
+    GantTest
   }
 }
 </script>

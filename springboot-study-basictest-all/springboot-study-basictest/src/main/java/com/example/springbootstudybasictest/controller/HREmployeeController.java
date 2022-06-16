@@ -24,9 +24,9 @@ public class HREmployeeController {
     //public List<HREmployeeVO> getHREmployeeList(@RequestParam(required = true) Integer page, @RequestParam(required = true) Integer perPageRow, @RequestParam(required = true) Integer perGroupPage)
     //public List<HREmployeeVO> getHREmployeeList(@RequestParam Integer page, @RequestParam Integer perPageRow, @RequestParam Integer perGroupPage)
     //public HashMap<String, Object> getHREmployeeList(int page , int perPageRow, int perGroupPage)
-    public List<HREmployeeVO> getHREmployeeList(PageObject pageObject, String key, String value)
+    public List<HREmployeeVO> getHREmployeeList(PageObject pageObject, String key, String value, String commissionNo, String managerNo, String departmentNo)
     {
-        List<HREmployeeVO> employeeList = hrEmployeeService.HREmployeeList(pageObject, key, value);
+        List<HREmployeeVO> employeeList = hrEmployeeService.HREmployeeList(pageObject, key, value, commissionNo, managerNo, departmentNo);
         return employeeList;
     }
 

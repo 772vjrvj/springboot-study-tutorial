@@ -6,7 +6,7 @@
         <b-form-select
             @change="selectRowChange"
             id="inline-form-custom-select-pref"
-            class="mb-2 mr-sm-2 mb-sm-0"
+            class="mb-2"
             :options="rowCountList"
             v-model="pageObject.perPageRow"
             value-field="item"
@@ -18,9 +18,27 @@
         <div class="pt-1"><span>Total Row : {{this.pageObject.totalRow}}</span></div>
       </div>
       <div class="col-auto">
-        <b-button v-b-modal.modal-1 variant="outline-secondary" >Etc. Search</b-button>
-        <b-modal id="modal-1" title="BootstrapVue">
-          <p class="my-4">Hello from modal!</p>
+        <b-button class="me-1"  v-b-modal.modal-prevent-closing variant="primary">Etc. Search</b-button>
+        <BIconFunnel v-if="noDataSelected.length === 0 " style="font-size: 1.5rem; color: #0d6efd"></BIconFunnel>
+        <BIconFunnelFill v-if="noDataSelected.length !== 0 "  style="font-size: 1.5rem; color: #0d6efd"></BIconFunnelFill>
+        <b-modal
+            id="modal-prevent-closing"
+            ref="modal"
+            title="Etc. Search"
+            @show="resetModal"
+            @hidden="resetModal"
+            @ok="handleOk"
+        >
+          <b-form-group label="No Data Search Check" v-slot="{ ariaDescribedby }">
+            <b-form-checkbox-group
+                id="checkbox-group-1"
+                v-model="noDataSelected"
+                :options="noDataOptions"
+                :aria-describedby="ariaDescribedby"
+                name="flavour-1"
+                stacked
+            ></b-form-checkbox-group>
+          </b-form-group>
         </b-modal>
       </div>
       <div class="col-auto">
@@ -50,23 +68,37 @@
         </div>
       </div>
     </div>
+
+
     <b-table striped hover responsive
              :fields="fields"
              :items="employees"
+             show-empty
+             :busy="isBusy"
     >
-      <template #cell(commissionPct)="data">
-        {{ data.value === -1 ? '-' : data.value }}
+      <template #table-busy>
+        <div class="text-center text-danger my-2">
+          <b-spinner class="align-middle"></b-spinner>
+          <strong>Loading...</strong>
+        </div>
+      </template>
+      <template #empty="scope">
+        <h4>{{ scope.emptyText }}</h4>
+      </template>
+      <template #cell(name)="data">
+        {{ data.item.firstName }} {{ data.item.lastName }}
       </template>
       <template #cell(salary)="data">
         {{ data.value === -1 ? 0 : data.value }}
       </template>
-      <template #cell(name)="data">
-        {{ data.item.firstName }} {{ data.item.lastName }}
+      <template #cell(commissionPct)="data">
+        {{ data.value === -1 ? '-' : data.value * 100 }}
       </template>
       <template #cell(manager)="data">
         {{ data.item.managerFirstName }} {{ data.item.managerLastName }}
       </template>
     </b-table>
+
     <div class="row justify-content-center">
       <div class="col-auto">
         <b-form-select
@@ -112,14 +144,20 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
 import HREmployeeService from '../services/HREmployeeService'
+import {BIconFunnel, BIconFunnelFill} from 'bootstrap-icons-vue'
 
 export default {
   name: 'BootVueHREmployeeList',
+  components: {
+    BIconFunnel,
+    BIconFunnelFill
+  },
   data(){
     return {
       employees : [],
@@ -174,19 +212,27 @@ export default {
       empColList: [{VALUE:'Search', KEY:'search' }],
       selectEmpCol:'search',
       searchInput:'',
+      noDataSelected: [], // Must be an array reference!
+      noDataOptions: [
+        { text: 'No Commission', value: 'commission' },
+        { text: 'No Manager', value: 'manager' },
+        { text: 'No Department', value: 'department' },
+      ],
+      isBusy: false,
     }
   },
   methods: {
     getHREmployees(page = 1){
       if(page){
         this.pageObject.page = page;
-        HREmployeeService.getHREmployees(page, this.pageObject.perPageRow, this.pageObject.perGroupPage, this.selectEmpCol, this.searchInput).then((response) => {
+        HREmployeeService.getHREmployees(page, this.pageObject.perPageRow, this.pageObject.perGroupPage, this.selectEmpCol, this.searchInput, this.noDataSelected).then((response) => {
           // if(response && response.data){
           //   this.employees = response.data.employeeList;
           //   this.pageObject = response.data.pageObject;
           // }
           // 화면에서 처리
-          if(response && response.data){
+          console.log('response ; ', response);
+          if(response && response.data && response.data.length > 0){
             this.employees = response.data;
             //화면에서 page를 만들어 보겠다.
             const totalCount = response.data[0].totalCount;
@@ -200,7 +246,20 @@ export default {
             this.pageObject.nextPage  = this.pageObject.page !== this.pageObject.totalPage;         // 다음 페이지 존재 여부
             this.pageObject.firstPage = this.pageObject.perGroupPage < this.pageObject.page;        // 처음 페이지 존재 여부
             this.pageObject.lastPage  = this.pageObject.endPage < this.pageObject.totalPage;        // 마지막 페이지 존재 여부
+
             console.log(this.pageObject);
+          }else{
+            this.employees = [];
+            this.pageObject.totalRow  = 0;
+            this.pageObject.totalPage = 0;
+            this.pageObject.startPage = 0;
+            this.pageObject.endPage   = 0;
+            // endPage 가 총 페이지 수를 넘을 수 없다.
+            this.pageObject.prevPage  = false;
+            this.pageObject.nextPage  = false;
+            this.pageObject.firstPage = false;
+            this.pageObject.lastPage  = false;
+
           }
         })
       }
@@ -244,7 +303,7 @@ export default {
     searchEmpCol(){
       if(this.selectEmpCol && this.searchInput){
         if(this.selectEmpCol === 'managerId' || this.selectEmpCol ===  'employeeId' || this.selectEmpCol === 'commissionPct'
-           || this.selectEmpCol === 'salary' ||this.selectEmpCol === 'departmentId'){
+            || this.selectEmpCol === 'salary' ||this.selectEmpCol === 'departmentId'){
           const searchInput =  Number(this.searchInput);
           if(Number.isNaN(searchInput)){
             alert('숫자를 입력하세요.');
@@ -256,6 +315,16 @@ export default {
     },
     pagination(){
       this.getHREmployees(this.pageObject.page);
+    },
+    resetModal(e) {
+      console.log('show hide state : ',e);
+    },
+    handleOk() {
+      this.handleSubmit()
+    },
+    handleSubmit() {
+      // Push the name to submitted names
+      console.log('etcSearchSelected', this.etcSearchSelected);
     }
   },
   created() {
@@ -264,8 +333,3 @@ export default {
   }
 }
 </script>
-<style>
-.test{
-  width: 15%
-}
-</style>
