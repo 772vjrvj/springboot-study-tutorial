@@ -1,0 +1,27 @@
+{
+  "data": {
+    "result": [
+      {
+        "resultData":{
+
+        },
+        "title": "titleA",
+        "dataList": {
+          "dataA": "dataA",
+          "dataB": "dataB",
+          "dataC": "dataC"
+        }
+      },
+      {
+
+      },
+      {
+
+      },
+      {
+
+      }
+    ]
+  }
+
+}

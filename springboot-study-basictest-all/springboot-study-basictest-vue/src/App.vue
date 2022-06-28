@@ -1,29 +1,27 @@
 <template>
   <div id="app">
-    <GantTest />
+    <GantTableCross />
   </div>
 </template>
 
 <script>
 // import BootVueHREmployeeList from './components/BootVueHREmployeeList.vue'
-import GantTest from './components/GantTest.vue'
+//import GantTest from './components/GantTest.vue'
+import GantTableCross from './components/GantTableCross.vue'
+
 
 export default {
   name: 'App',
   components: {
     // BootVueHREmployeeList,
-    GantTest
+    //GantTest
+    GantTableCross
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+
 }
 </style>
