@@ -1,21 +1,23 @@
 <template>
   <div id="app">
-    <GantTableCross />
+    <GantTable />
   </div>
 </template>
 
 <script>
-// import BootVueHREmployeeList from './components/BootVueHREmployeeList.vue'
+//import BootVueHREmployeeList from './components/BootVueHREmployeeList.vue'
 //import GantTest from './components/GantTest.vue'
-import GantTableCross from './components/GantTableCross.vue'
+//import GantTableCross from './components/GantTableCross.vue'
+import GantTable from './components/GantTableCross.vue'
 
 
 export default {
   name: 'App',
   components: {
-    // BootVueHREmployeeList,
+    //BootVueHREmployeeList,
     //GantTest
-    GantTableCross
+    //GantTableCross
+    GantTable
   }
 }
 </script>

@@ -45,21 +45,26 @@ export default {
     data(){
       return {
         //실제 DB에서는 rowspan, deps, icon, button 은 안넘어 온다. 화면에서 동적으로 세팅한다.
-        total :
+        job :
           {
             id: 'tot', title: 'Total', rowspan: '', deps: '', icon: [], button:'',  children: [
-              { id: 'dept', title: 'Department',      rowspan: '', children: [
-                { id: 'ad',   title: 'Administration',  rowspan: ''},
-                { id: 'mk',   title: 'Marketing',       rowspan: ''},
-                { id: 'pu',   title: 'Purchasing',      rowspan: ''},
-                { id: 'hr',   title: 'Human Resources', rowspan: ''},
+              { id: 'AD', title: 'Administration',      rowspan: '', children: [
+                { id: 'AD_PRES',   title: 'President',  rowspan: ''},
+                { id: 'AD_VP',   title: 'Vice President',       rowspan: ''},
+                { id: 'AD_ASST',   title: 'Assistant',      rowspan: ''},
                 ]},
-              { id: 'job', title: 'Job', rowspan: '', children: [
-                { id: 'ad_asst', title: 'Administration Assistant', rowspan: ''},
-                { id: 'mk_man', title: 'Marketing Manager', rowspan: ''},
-                { id: 'pu_man', title: 'Purchasing Manager', rowspan: ''},
-                { id: 'hr_rep', title: 'Human Resources Representative', rowspan: ''},
-              ]}
+              { id: 'FI', title: 'Finance', rowspan: '', children: [
+                { id: 'FI_MGR', title: 'Manager', rowspan: ''},
+                { id: 'FI_ACCOUNT', title: 'Accountant', rowspan: ''},
+                { id: 'AC_MGR', title: 'Manager', rowspan: ''},
+                { id: 'AC_ACCOUNT', title: 'Accountant', rowspan: ''},
+              ]},
+              { id: 'SA', title: 'Sales', rowspan: '', children: [
+                  { id: 'SA_MAN', title: 'Sales Manager', rowspan: ''},
+                  { id: 'SA_REP', title: 'Sales Representative', rowspan: ''},
+                  { id: 'PU_MAN', title: 'Purchasing Manager', rowspan: ''},
+                  { id: 'PU_CLERK', title: 'Purchasing Clerk', rowspan: ''},
+                ]},
             ]
           },
 
