@@ -1,5 +1,16 @@
 # springboot-study-basictest-vue
 
+https://cdmoro.github.io/bootstrap-vue-3/
+
+https://bootstrap-vue.org/docs
+
+
+npm install vue-router --save // dependencies
+
+npm install bootstrap-vue-3
+npm install bootstrap-vue
+npm install bootstrap-icons-vue
+
 
 # node 버전
 PS E:\springboot-study-basictest-all> node -v

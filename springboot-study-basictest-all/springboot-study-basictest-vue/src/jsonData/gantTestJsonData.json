@@ -2,9 +2,9 @@
   "data": {
     "result": [
       {
-        "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM1",
+        "COUNTRY": "Korea",
+        "CITY": "Seoul",
+        "Team": "Team1",
         "AD_PRES": "AD_PRES1",
         "AD_VP": "AD_VP1",
         "AD_ASST": "AD_ASST1",
@@ -27,8 +27,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -51,8 +51,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -75,8 +75,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -99,8 +99,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -123,8 +123,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -147,8 +147,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -171,8 +171,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -195,8 +195,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -219,8 +219,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
@@ -243,8 +243,8 @@
       },
       {
         "COUNTRY": "KOERA",
-        "CITY": "SEOUL",
-        "TEAM": "TEAM2",
+        "CITY": "Seoul",
+        "Team": "Team2",
         "AD_PRES": "AD_PRES2",
         "AD_VP": "AD_VP2",
         "AD_ASST": "AD_ASST2",
