@@ -134,8 +134,6 @@ export default {
         // sub title은 column이 2개 또는 3개 이다.
         // 실제 DB에서는 rowspan, deps, icon, button 은 안넘어 온다. 화면에서 동적으로 세팅한다. 아래는 서버에서 넘어온
         // 데이터 형식이다.
-
-
         //왼쪽 헤더의 dept에 따라 넓이를 동적으로 정해주어야 한다. 1~3까지만 지원
 
         //순서를 위한 job list
