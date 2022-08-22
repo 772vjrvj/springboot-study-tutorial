@@ -136,6 +136,7 @@ export default {
         // 데이터 형식이다.
         //왼쪽 헤더의 dept에 따라 넓이를 동적으로 정해주어야 한다. 1~3까지만 지원
 
+
         //순서를 위한 job list
         titleList: [],
         mainTitleObj: {
