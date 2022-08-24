@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springbootstudybasictest.mapper.HRTeamMapper">
+
+    <select id="HRTeamList" resultType="HRTeamVO">
+        SELECT J.JOB_TITLE, J.JOB_ID, S.SECTION_NAME, S.SECTION_ID, T.TEAM_NAME, T.TEAM_ID
+        FROM JOBS J LEFT JOIN SECTION S on J.SECTION_ID = S.SECTION_ID
+                    LEFT JOIN TEAM T on S.TEAM_ID = T.TEAM_ID
+        ORDER BY T.TEAM_ID ASC, S.SECTION_ID ASC, J.MAX_SALARY DESC
+    </select>
+</mapper>

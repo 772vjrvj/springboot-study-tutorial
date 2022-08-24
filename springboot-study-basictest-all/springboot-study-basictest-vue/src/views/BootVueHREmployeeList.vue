@@ -246,8 +246,6 @@ export default {
             this.pageObject.nextPage  = this.pageObject.page !== this.pageObject.totalPage;         // 다음 페이지 존재 여부
             this.pageObject.firstPage = this.pageObject.perGroupPage < this.pageObject.page;        // 처음 페이지 존재 여부
             this.pageObject.lastPage  = this.pageObject.endPage < this.pageObject.totalPage;        // 마지막 페이지 존재 여부
-
-            console.log(this.pageObject);
           }else{
             this.employees = [];
             this.pageObject.totalRow  = 0;
@@ -259,7 +257,6 @@ export default {
             this.pageObject.nextPage  = false;
             this.pageObject.firstPage = false;
             this.pageObject.lastPage  = false;
-
           }
         })
       }

@@ -11,36 +11,32 @@
       </div>
     </div>
 
-
-
-
-
     <div class="sub-left-container">
       <div class="sub-left-container-top">
         <table>
           <thead>
             <tr>
               <th colspan="2" rowspan="2">
-                {{mainTitleObj.children[0].title}}
+                {{mainTitle[0].title}}
               </th>
               <th>
-                {{mainTitleObj.children[0].children[0].title}}
-              </th>
-            </tr>
-            <tr>
-              <th>
-                {{mainTitleObj.children[0].children[1].title}}
+                {{mainTitle[0].children[0].title}}
               </th>
             </tr>
             <tr>
               <th>
-                {{mainTitleObj.children[1].title}}
+                {{mainTitle[0].children[1].title}}
+              </th>
+            </tr>
+            <tr>
+              <th>
+                {{mainTitle[1].title}}
               </th>
               <th>
-                {{mainTitleObj.children[1].children[0].title}}
+                {{mainTitle[1].children[0].title}}
               </th>
               <th>
-                {{mainTitleObj.children[1].children[0].children[0].title}}
+                {{mainTitle[1].children[0].children[0].title}}
               </th>
             </tr>
           </thead>
@@ -49,7 +45,7 @@
       <div class="sub-left-container-bottom" ref="subleftcontainerbottom">
         <table>
           <thead>
-            <template v-for="(item, index) in subTitleObj.children" :key="index">
+            <template v-for="(item, index) in subTitle" :key="index">
               <template v-for="(child, idx) in item.children">
                 <template v-for="(c, i) in child.children">
                   <tr v-if="idx ===0 && i===0" :key="index+idx+i">
@@ -128,6 +124,10 @@ export default {
     name: 'GantChartTest',
     data(){
       return {
+        url: {
+          teamList: '/team/list'
+        },
+
 
         //기본적인 약속
         // main title은 2rows에 2번째로 row에 column이 2개 혹은 3개
@@ -139,73 +139,71 @@ export default {
 
         //순서를 위한 job list
         titleList: [],
-        mainTitleObj: {
-          id: '', title: '', children: [
-            { id: 'LOC',   title: 'Location', rowspan: 2, colspan: 2,  children: [
-              { id: 'CT',   title: 'Country',   children: [
+        mainTitle: [
+          { id: 'LOC',   title: 'Location', rowspan: 2, colspan: 2,  children: [
+            { id: 'CT',   title: 'Country',   children: [
 
-                ]},
-              { id: 'CI',   title: 'City',   children: [
-
-                ]},
               ]},
-            { id: 'DP', title: 'Department', children: [
-              { id: 'SECTION', title: 'Section', children: [
-                { id: 'JOB', title: 'Job', children: [
+            { id: 'CI',   title: 'City',   children: [
 
-                  ]},
               ]},
             ]},
-          ]
-        },
+          { id: 'DP', title: 'Department', children: [
+            { id: 'SECTION', title: 'Section', children: [
+              { id: 'JOB', title: 'Job', children: [
+
+                ]},
+            ]},
+          ]},
+        ]
+        ,
         //DB에서 가져올 수도 있고 미리 만들어 놓을 수도 있다. 여기선 편의상 미리 만들어 놓은 rowspan만 동적으로 넣자
-        subTitleObj :{
-          id: '', title: '', children: [
-            { id: 'TAD', title: 'Total Administration', children: [
-              { id: 'AD', title: 'Administration', children: [
-                { id: 'AD_PRES', title: 'AD_PRES',      children: []},
-                { id: 'AD_VP',   title: 'AD_VP', children: []},
-                { id: 'AD_ASST', title: 'AD_ASST',      children: []},
-                ]},
-              ]},
-            { id: 'EX', title: 'Exchequer', children: [
-              { id: 'FA', title: 'Finance', children: [
-                { id: 'FI_MGR',     title: 'FI_MGR',    children: []},
-                { id: 'FI_ACCOUNT', title: 'FI_ACCOUNT',         children: []},
-                { id: 'AC_MGR',     title: 'AC_MGR', children: []},
-                { id: 'AC_ACCOUNT', title: 'AC_ACCOUNT',  children: []},
-                ]},
-              { id: 'SH', title: 'Stock', children: [
-                { id: 'ST_MAN',     title: 'ST_MAN',    children: []},
-                { id: 'ST_CLERK', title: 'ST_CLERK',         children: []},
-                { id: 'SH_CLERK',     title: 'SH_CLERK', children: []},
-                ]},
-              ]},
-            { id: 'ST', title: 'Sales', children: [
-              { id: 'SP', title: 'Sales & Purchasing', children: [
-                { id: 'SA_MAN',   title: 'SA_MAN',        children: []},
-                { id: 'SA_REP',   title: 'SA_REP', children: []},
-                { id: 'PU_MAN',   title: 'PU_MAN',   children: []},
-                { id: 'PU_CLERK', title: 'PU_CLERK',     children: []},
-                ]},
-              { id: 'MK', title: 'Marketing', children: [
-                { id: 'MK_MAN',   title: 'MK_MAN',        children: []},
-                { id: 'MK_REP',   title: 'MK_REP', children: []},
-                ]},
-              ]},
-            { id: 'HR', title: 'Human Resources', children: [
-              { id: 'HP', title: 'Human & Public', children: [
-                { id: 'HR_REP', title: 'HR_REP', children: []},
-                { id: 'PR_REP', title: 'PR_REP', children: []},
-              ]},
-            ]},
-            { id: 'ITD', title: 'IT Development', children: [
-              { id: 'IT', title: 'IT', children: [
-                  { id: 'IT_PROG', title: 'IT_PROG', children: []},
-                ]},
-            ]},
-          ]
-        },
+        // subTitle :[
+        //   { id: 'TAD', title: 'Total Administration', children: [
+        //     { id: 'AD', title: 'Administration', children: [
+        //       { id: 'AD_PRES', title: 'AD_PRES'},
+        //       { id: 'AD_VP',   title: 'AD_VP'},
+        //       { id: 'AD_ASST', title: 'AD_ASST'},
+        //       ]},
+        //     ]},
+        //   { id: 'EX', title: 'Exchequer', children: [
+        //     { id: 'FA', title: 'Finance', children: [
+        //       { id: 'FI_MGR',     title: 'FI_MGR'},
+        //       { id: 'FI_ACCOUNT', title: 'FI_ACCOUNT'},
+        //       { id: 'AC_MGR',     title: 'AC_MGR'},
+        //       { id: 'AC_ACCOUNT', title: 'AC_ACCOUNT'},
+        //       ]},
+        //     { id: 'SH', title: 'Stock', children: [
+        //       { id: 'ST_MAN',     title: 'ST_MAN'},
+        //       { id: 'ST_CLERK',   title: 'ST_CLERK'},
+        //       { id: 'SH_CLERK',   title: 'SH_CLERK'},
+        //       ]},
+        //     ]},
+        //   { id: 'ST', title: 'Sales', children: [
+        //     { id: 'SP', title: 'Sales & Purchasing', children: [
+        //       { id: 'SA_MAN',   title: 'SA_MAN'},
+        //       { id: 'SA_REP',   title: 'SA_REP'},
+        //       { id: 'PU_MAN',   title: 'PU_MAN'},
+        //       { id: 'PU_CLERK', title: 'PU_CLERK'}
+        //       ]},
+        //     { id: 'MK', title: 'Marketing', children: [
+        //       { id: 'MK_MAN',   title: 'MK_MAN'},
+        //       { id: 'MK_REP',   title: 'MK_REP'}
+        //       ]},
+        //     ]},
+        //   { id: 'HR', title: 'Human Resources', children: [
+        //     { id: 'HP', title: 'Human & Public', children: [
+        //       { id: 'HR_REP', title: 'HR_REP'},
+        //       { id: 'PR_REP', title: 'PR_REP'}
+        //     ]},
+        //   ]},
+        //   { id: 'ITD', title: 'IT Development', children: [
+        //     { id: 'IT', title: 'IT', children: [
+        //         { id: 'IT_PROG', title: 'IT_PROG'}
+        //       ]},
+        //   ]},
+        // ],
+        subTitle :[],
         headerObj: [],
         contentObj: [],
       }
@@ -220,7 +218,6 @@ export default {
           this.contentObj[index] = resList;
         });
       },
-
       setRowHeader(){
         const subTitleObj = this.subTitleObj;
         _.each(subTitleObj.children, o1 => {
@@ -247,25 +244,74 @@ export default {
         this.$refs.subleftcontainerbottom.scrollTop = e.target.scrollTop;
         this.$refs.subrightcontainertop.scrollLeft = e.target.scrollLeft;
       },
-
-    },
-    created() {
-      this.setRowHeader();
-    },
-    mounted() {
-      axios.get('./gantTestJsonData.json').then(res => {
-        const result = res.data.result;
-        const header = _.map(result, item => {
-          return {
-            "COUNTRY" : item.COUNTRY,
-            "CITY" : item.CITY,
-            "TEAM" : item.TEAM
+      setTeam(dataList){
+        let team = [];
+        _.each(dataList, data => {
+          const index = _.findIndex(team, o =>
+              o.id === data.teamId
+          );
+          const childObj = {
+            jobId: data.jobId,
+            jobTitle: data.jobTitle,
+            sectionId: data.sectionId,
+            sectionName: data.sectionName
+          }
+          if(index > -1){
+            team[index].children.push(childObj);
+            team[index].rowspan = team[index].rowspan + 1;
+          }else{
+            const obj = {
+              id: data.teamId,
+              title: data.teamName,
+              rowspan: 1,
+              children: [childObj]
+            }
+            team.push(obj);
           }
         });
-        this.headerObj = header
-        this.setBodyRightBottom(result);
-
+        return team;
+      },
+      setSection(teamList){
+        _.each(teamList, team => {
+          let sectionList = [];
+          _.each(team.children, child => {
+            const index = _.findIndex(sectionList, o =>
+                o.id === child.sectionId
+            );
+            const childObj = {
+              id: child.jobId,
+              title: child.jobTitle,
+            }
+            if(index > -1){
+              sectionList[index].children.push(childObj);
+              sectionList[index].rowspan = sectionList[index].rowspan + 1;
+            }else{
+              const obj = {
+                id: child.sectionId,
+                title: child.sectionName,
+                rowspan: 1,
+                children: [childObj]
+              }
+              sectionList.push(obj);
+            }
+          });
+          team.children = sectionList;
+        });
+        return teamList;
+      },
+    },
+    created() {
+      axios.get(this.url.teamList).then(res => {
+        if(res && res.status === 200 && res.data){
+          const dataList = res.data;
+          let team = this.setTeam(dataList);
+          team = this.setSection(team);
+          this.subTitle = team;
+        }
       });
+    },
+    mounted() {
+
     },
     updated() {
 
