@@ -1,6 +1,7 @@
 package com.example.springbootstudybasictest.controller;
 
 import com.example.springbootstudybasictest.service.HRTeamService;
+import com.example.springbootstudybasictest.vo.HRTeamMemberVO;
 import com.example.springbootstudybasictest.vo.HRTeamVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,12 @@ public class HRTeamController {
     @GetMapping("/list")
     public List<HRTeamVO> HRTeamList(){
         List<HRTeamVO> hrTeamList = hrTeamService.HRTeamList();return hrTeamList;
+    }
+
+    @GetMapping("/member")
+    public List<HRTeamMemberVO> HRTeamMemberList(){
+        List<HRTeamMemberVO> hrTeamMemberList = hrTeamService.HRTeamMemberList();
+        return hrTeamMemberList;
     }
 
 }

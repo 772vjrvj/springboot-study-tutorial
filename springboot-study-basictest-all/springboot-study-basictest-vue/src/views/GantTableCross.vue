@@ -83,19 +83,9 @@
       <div class="sub-right-container-top" ref="subrightcontainertop">
         <table>
           <thead>
-            <tr>
-              <th v-for="(h, i) in headerObj" :key="i">
-                {{h.COUNTRY}}
-              </th>
-            </tr>
-            <tr>
-              <th v-for="(h, i) in headerObj" :key="i">
-                {{h.CITY}}
-              </th>
-            </tr>
-            <tr>
-              <th v-for="(h, i) in headerObj" :key="i">
-                {{h.TEAM}}
+            <tr v-for="(title, index) in columnTitle" :key="index">
+              <th v-for="(name, idx) in title" :key="idx">
+                {{name}}
               </th>
             </tr>
           </thead>
@@ -104,9 +94,9 @@
       <div class="sub-right-container-bottom" @scroll="scrollEvent">
         <table>
           <tbody>
-            <tr v-for="(obj, index) in contentObj" :key="index">
-              <td v-for="(o, i) in obj" :key="i">
-                {{o}}
+            <tr v-for="(member, index) in teamMemberList" :key="index">
+              <td v-for="(m, i) in member" :key="i">
+                {{m + 1}}
               </td>
             </tr>
           </tbody>
@@ -125,7 +115,8 @@ export default {
     data(){
       return {
         url: {
-          teamList: '/team/list'
+          teamList: '/team/list',
+          memberList: '/team/member'
         },
 
 
@@ -138,7 +129,7 @@ export default {
 
 
         //순서를 위한 job list
-        titleList: [],
+
         mainTitle: [
           { id: 'LOC',   title: 'Location', rowspan: 2, colspan: 2,  children: [
             { id: 'CT',   title: 'Country',   children: [
@@ -148,15 +139,14 @@ export default {
 
               ]},
             ]},
-          { id: 'DP', title: 'Department', children: [
+          { id: 'DP', title: 'Team', children: [
             { id: 'SECTION', title: 'Section', children: [
               { id: 'JOB', title: 'Job', children: [
 
                 ]},
             ]},
           ]},
-        ]
-        ,
+        ], //메임 이름
         //DB에서 가져올 수도 있고 미리 만들어 놓을 수도 있다. 여기선 편의상 미리 만들어 놓은 rowspan만 동적으로 넣자
         // subTitle :[
         //   { id: 'TAD', title: 'Total Administration', children: [
@@ -203,9 +193,14 @@ export default {
         //       ]},
         //   ]},
         // ],
-        subTitle :[],
-        headerObj: [],
-        contentObj: [],
+        subTitle :[], //메인 하위 이름
+        jobOrderList: [], //member 세팅할시 순서로 필요
+        columnTitle: [],
+        countryName: [],
+        cityName: [],
+        partName: [],
+        teamMemberList: []
+
       }
     },
     methods: {
@@ -244,9 +239,13 @@ export default {
         this.$refs.subleftcontainerbottom.scrollTop = e.target.scrollTop;
         this.$refs.subrightcontainertop.scrollLeft = e.target.scrollLeft;
       },
+
+
+
       setTeam(dataList){
         let team = [];
         _.each(dataList, data => {
+          this.jobOrderList.push(data.jobId); //member 세팅할시 순서로 필요
           const index = _.findIndex(team, o =>
               o.id === data.teamId
           );
@@ -299,16 +298,79 @@ export default {
         });
         return teamList;
       },
+      setTeamList(){
+        return axios.get(this.url.teamList).then(res => {
+          if(res && res.status === 200 && res.data){
+            const data = res.data;
+            console.log('setTeamList data : ',data);
+            let team = this.setTeam(data);
+            team = this.setSection(team);
+            this.subTitle = team;
+            return team;
+          }
+        }).catch(e => {
+          console.log('error : ',e);
+        }).finally(() => {
+
+        })
+      },
+      setMemberList(){
+        axios.get(this.url.memberList).then(res => {
+          if(res && res.status === 200 && res.data){
+            const data = res.data;
+            console.log('jobId order list : ', this.jobOrderList);
+            console.log('setMemberList data : ',data);
+            let grp = _.groupBy(data, 'locationId');
+            const grpKeys = _.keys(grp);
+            console.log('grp : ', grp);
+
+            let countryName = [];
+            let cityName = [];
+            let partName = [];
+
+
+            const grpCntArr = new Array(grpKeys.length).fill('');
+            const jobIdListLen = this.jobOrderList.length;
+            let teaMemberArr = new Array(jobIdListLen).fill(grpCntArr);
+            console.log('teaMemberArr: ', teaMemberArr);
+
+            for (const grpKey in grp) {
+              let g = grp[grpKey];
+              _.each(g, (d, i) => {
+                //column header 세팅
+                if(i === 0){
+                  const countryNm = d.countryName ? d.countryName : 'unknown';
+                  const cityNm = d.city ? d.city : 'unknown';
+                  const partNm = d.part ? d.part : 'unknown';
+                  countryName.push(countryNm);
+                  cityName.push(cityNm);
+                  partName.push(partNm);
+                }
+
+
+
+
+              });
+            }
+
+            this.columnTitle = [countryName, cityName, partName];
+            this.countryName = countryName;
+            this.cityName = cityName;
+            this.partName = partName;
+
+            this.teamMemberList = teaMemberArr;
+          }
+        })
+      },
+
+      async getTeamList(){
+        await this.setTeamList();
+        await this.setMemberList();
+      }
+
     },
     created() {
-      axios.get(this.url.teamList).then(res => {
-        if(res && res.status === 200 && res.data){
-          const dataList = res.data;
-          let team = this.setTeam(dataList);
-          team = this.setSection(team);
-          this.subTitle = team;
-        }
-      });
+      this.getTeamList();
     },
     mounted() {
 
