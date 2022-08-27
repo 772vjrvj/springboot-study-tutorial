@@ -1,106 +1,107 @@
 <template>
-  <div class="container">
-    <div class="text-start fs-4 mb-lg-5 position-relative">Team List.</div>
-
-    <div class="row justify-content-start">
-      <div class="col-auto">
-        <div class="pt-1"><span>Total Row : </span></div>
+  <div class="main-container" @mousemove="viewTooltip">
+    <p class="t_tooltip" ref="t_tooltip">111</p>
+    <div class="sub-container">
+      <div class="text-start fs-4 mb-lg-5 position-relative">Team List.</div>
+      <div class="row justify-content-start">
+        <div class="col-auto">
+          <div class="pt-1"><span>Total Row : </span></div>
+        </div>
+        <div class="col-auto">
+          <div class="pt-1"><span>Total Team : </span></div>
+        </div>
       </div>
-      <div class="col-auto">
-        <div class="pt-1"><span>Total Team : </span></div>
-      </div>
-    </div>
-
-    <div class="sub-left-container">
-      <div class="sub-left-container-top">
-        <table>
-          <thead>
-            <tr>
-              <th colspan="2" rowspan="2">
-                {{mainTitle[0].title}}
-              </th>
-              <th>
-                {{mainTitle[0].children[0].title}}
-              </th>
-            </tr>
-            <tr>
-              <th>
-                {{mainTitle[0].children[1].title}}
-              </th>
-            </tr>
-            <tr>
-              <th>
-                {{mainTitle[1].title}}
-              </th>
-              <th>
-                {{mainTitle[1].children[0].title}}
-              </th>
-              <th>
-                {{mainTitle[1].children[0].children[0].title}}
-              </th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-      <div class="sub-left-container-bottom" ref="subleftcontainerbottom">
-        <table>
-          <thead>
-            <template v-for="(item, index) in subTitle" :key="index">
-              <template v-for="(child, idx) in item.children">
-                <template v-for="(c, i) in child.children">
-                  <tr v-if="idx ===0 && i===0" :key="index+idx+i">
-                    <th :rowspan="item.rowspan">
-                      {{item.title}}
-                    </th>
-                    <th :rowspan="child.rowspan">
-                      {{child.title}}
-                    </th>
-                    <th :id="c.id">
-                      {{c.title}}
-                    </th>
-                  </tr>
-                  <tr v-else-if="idx !==0 && i===0" :key="idx+i">
-                    <th :rowspan="child.rowspan">
-                      {{child.title}}
-                    </th>
-                    <th :id="c.id">
-                      {{c.title}}
-                    </th>
-                  </tr>
-                  <tr v-if="i!==0" :key="i">
-                    <th :id="c.id">
-                      {{c.title}}
-                    </th>
-                  </tr>
+      <div class="sub-left-container">
+        <div class="sub-left-container-top">
+          <table>
+            <thead>
+              <tr>
+                <th colspan="2" rowspan="2">
+                  {{mainTitle[0].title}}
+                </th>
+                <th>
+                  {{mainTitle[0].children[0].title}}
+                </th>
+              </tr>
+              <tr>
+                <th>
+                  {{mainTitle[0].children[1].title}}
+                </th>
+              </tr>
+              <tr>
+                <th>
+                  {{mainTitle[1].title}}
+                </th>
+                <th>
+                  {{mainTitle[1].children[0].title}}
+                </th>
+                <th>
+                  {{mainTitle[1].children[0].children[0].title}}
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="sub-left-container-bottom" ref="subleftcontainerbottom">
+          <table>
+            <thead>
+              <template v-for="(item, index) in subTitle" :key="index">
+                <template v-for="(child, idx) in item.children">
+                  <template v-for="(c, i) in child.children">
+                    <tr v-if="idx ===0 && i===0" :key="index+idx+i">
+                      <th :rowspan="item.rowspan">
+                       {{item.title}}
+                      </th>
+                      <th :rowspan="child.rowspan">
+                        {{child.title}}
+                      </th>
+                      <th :id="c.id">
+                        {{c.title}}
+                      </th>
+                    </tr>
+                    <tr v-else-if="idx !==0 && i===0" :key="idx+i">
+                      <th :rowspan="child.rowspan">
+                        {{item.title}}
+                      </th>
+                      <th :id="c.id">
+                        {{c.title}}
+                      </th>
+                    </tr>
+                    <tr v-if="i!==0" :key="i" >
+                      <th :id="c.id">
+                        {{c.title}}
+                      </th>
+                    </tr>
+                  </template>
                 </template>
               </template>
-            </template>
-          </thead>
-        </table>
+            </thead>
+          </table>
+        </div>
       </div>
-    </div>
-    <div class="sub-right-container">
-      <div class="sub-right-container-top" ref="subrightcontainertop">
-        <table>
-          <thead>
-            <tr v-for="(title, index) in columnTitle" :key="index">
-              <th v-for="(name, idx) in title" :key="idx">
-                {{name}}
-              </th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-      <div class="sub-right-container-bottom" @scroll="scrollEvent">
-        <table>
-          <tbody>
-            <tr v-for="(member, index) in teamMemberList" :key="index">
-              <td v-for="(m, i) in member" :key="i">
-                {{m + 1}}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sub-right-container">
+        <div class="sub-right-container-top" ref="subrightcontainertop">
+          <table>
+            <thead>
+              <tr v-for="(title, index) in columnTitle" :key="index">
+                <th v-for="(name, idx) in title" :key="idx">
+                 {{name}}
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="sub-right-container-bottom" @scroll="scrollEvent">
+          <table>
+            <tbody>
+              <tr v-for="(member, index) in teamMemberList" :key="index">
+                <td v-for="(m, i) in member" :key="i" >
+                  {{m}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -120,16 +121,6 @@ export default {
         },
 
 
-        //기본적인 약속
-        // main title은 2rows에 2번째로 row에 column이 2개 혹은 3개
-        // sub title은 column이 2개 또는 3개 이다.
-        // 실제 DB에서는 rowspan, deps, icon, button 은 안넘어 온다. 화면에서 동적으로 세팅한다. 아래는 서버에서 넘어온
-        // 데이터 형식이다.
-        //왼쪽 헤더의 dept에 따라 넓이를 동적으로 정해주어야 한다. 1~3까지만 지원
-
-
-        //순서를 위한 job list
-
         mainTitle: [
           { id: 'LOC',   title: 'Location', rowspan: 2, colspan: 2,  children: [
             { id: 'CT',   title: 'Country',   children: [
@@ -147,105 +138,45 @@ export default {
             ]},
           ]},
         ], //메임 이름
-        //DB에서 가져올 수도 있고 미리 만들어 놓을 수도 있다. 여기선 편의상 미리 만들어 놓은 rowspan만 동적으로 넣자
-        // subTitle :[
-        //   { id: 'TAD', title: 'Total Administration', children: [
-        //     { id: 'AD', title: 'Administration', children: [
-        //       { id: 'AD_PRES', title: 'AD_PRES'},
-        //       { id: 'AD_VP',   title: 'AD_VP'},
-        //       { id: 'AD_ASST', title: 'AD_ASST'},
-        //       ]},
-        //     ]},
-        //   { id: 'EX', title: 'Exchequer', children: [
-        //     { id: 'FA', title: 'Finance', children: [
-        //       { id: 'FI_MGR',     title: 'FI_MGR'},
-        //       { id: 'FI_ACCOUNT', title: 'FI_ACCOUNT'},
-        //       { id: 'AC_MGR',     title: 'AC_MGR'},
-        //       { id: 'AC_ACCOUNT', title: 'AC_ACCOUNT'},
-        //       ]},
-        //     { id: 'SH', title: 'Stock', children: [
-        //       { id: 'ST_MAN',     title: 'ST_MAN'},
-        //       { id: 'ST_CLERK',   title: 'ST_CLERK'},
-        //       { id: 'SH_CLERK',   title: 'SH_CLERK'},
-        //       ]},
-        //     ]},
-        //   { id: 'ST', title: 'Sales', children: [
-        //     { id: 'SP', title: 'Sales & Purchasing', children: [
-        //       { id: 'SA_MAN',   title: 'SA_MAN'},
-        //       { id: 'SA_REP',   title: 'SA_REP'},
-        //       { id: 'PU_MAN',   title: 'PU_MAN'},
-        //       { id: 'PU_CLERK', title: 'PU_CLERK'}
-        //       ]},
-        //     { id: 'MK', title: 'Marketing', children: [
-        //       { id: 'MK_MAN',   title: 'MK_MAN'},
-        //       { id: 'MK_REP',   title: 'MK_REP'}
-        //       ]},
-        //     ]},
-        //   { id: 'HR', title: 'Human Resources', children: [
-        //     { id: 'HP', title: 'Human & Public', children: [
-        //       { id: 'HR_REP', title: 'HR_REP'},
-        //       { id: 'PR_REP', title: 'PR_REP'}
-        //     ]},
-        //   ]},
-        //   { id: 'ITD', title: 'IT Development', children: [
-        //     { id: 'IT', title: 'IT', children: [
-        //         { id: 'IT_PROG', title: 'IT_PROG'}
-        //       ]},
-        //   ]},
-        // ],
         subTitle :[], //메인 하위 이름
         jobOrderList: [], //member 세팅할시 순서로 필요
         columnTitle: [],
         countryName: [],
         cityName: [],
         partName: [],
-        teamMemberList: []
+        teamMemberList: [],
+        tooltipTimer: null
 
       }
     },
     methods: {
-      setBodyRightBottom(result){
-        _.each(this.titleList, (title, index) => {
-          let resList = [];
-          _.each(result, res => {
-            resList.push(res[title]);
-          });
-          this.contentObj[index] = resList;
-        });
+
+      viewTooltip(e){
+        clearTimeout(this.tooltipTimer);
+        this.$refs.t_tooltip.style.display = 'none';
+        if(e.target.tagName === 'TD' || e.target.tagName === 'TH'){
+          this.tooltipTimer = setTimeout(() => {
+            this.$refs.t_tooltip.style.display = 'block';
+            this.$refs.t_tooltip.style.left = e.pageX + 'px';
+            this.$refs.t_tooltip.style.top = e.pageY - 50 + 'px';
+            this.$refs.t_tooltip.innerText = e.target.innerText;
+            console.log('e.target.innerText : ', e.target.innerText);
+          }, 1000)
+
+        }
       },
-      setRowHeader(){
-        const subTitleObj = this.subTitleObj;
-        _.each(subTitleObj.children, o1 => {
-          o1.rowspan = 0;
 
-          _.each(o1.children, o2 => {
-            o2.rowspan = o2.children.length;
-            o1.rowspan = o1.rowspan + o2.rowspan;
-          });
-
-        });
-        this.subTitleObj = subTitleObj;
-
-        _.each(subTitleObj.children, o1 => {
-          _.each(o1.children, o2 => {
-            _.each(o2.children, o3 => {
-              this.titleList.push(o3.id);
-            });
-          });
-        });
-
-      },
       scrollEvent(e){
         this.$refs.subleftcontainerbottom.scrollTop = e.target.scrollTop;
         this.$refs.subrightcontainertop.scrollLeft = e.target.scrollLeft;
       },
 
-
-
       setTeam(dataList){
         let team = [];
+        let jobOrderList = [];
         _.each(dataList, data => {
-          this.jobOrderList.push(data.jobId); //member 세팅할시 순서로 필요
+          jobOrderList.push(data.jobId); //member 세팅할시 순서로 필요
+
           const index = _.findIndex(team, o =>
               o.id === data.teamId
           );
@@ -268,8 +199,10 @@ export default {
             team.push(obj);
           }
         });
+        this.jobOrderList = jobOrderList;
         return team;
       },
+
       setSection(teamList){
         _.each(teamList, team => {
           let sectionList = [];
@@ -298,6 +231,7 @@ export default {
         });
         return teamList;
       },
+
       setTeamList(){
         return axios.get(this.url.teamList).then(res => {
           if(res && res.status === 200 && res.data){
@@ -314,43 +248,53 @@ export default {
 
         })
       },
+
       setMemberList(){
         axios.get(this.url.memberList).then(res => {
           if(res && res.status === 200 && res.data){
             const data = res.data;
-            console.log('jobId order list : ', this.jobOrderList);
-            console.log('setMemberList data : ',data);
+
             let grp = _.groupBy(data, 'locationId');
+
             const grpKeys = _.keys(grp);
-            console.log('grp : ', grp);
-
-            let countryName = [];
-            let cityName = [];
-            let partName = [];
-
-
-            const grpCntArr = new Array(grpKeys.length).fill('');
+            const grpKeysLen =  grpKeys.length;
             const jobIdListLen = this.jobOrderList.length;
-            let teaMemberArr = new Array(jobIdListLen).fill(grpCntArr);
-            console.log('teaMemberArr: ', teaMemberArr);
 
+            let countryName = new Array(grpKeysLen);
+            let cityName = new Array(grpKeysLen);
+            let partName = new Array(grpKeysLen);
+
+            let teaMemberArr = [];
+
+            for (let i = 0; i < jobIdListLen; i++) {
+              const grpCntArr = new Array(grpKeysLen).fill('');
+              teaMemberArr.push(grpCntArr);
+            }
+
+            let colIndex = -1;
             for (const grpKey in grp) {
+              colIndex++;
               let g = grp[grpKey];
-              _.each(g, (d, i) => {
-                //column header 세팅
-                if(i === 0){
-                  const countryNm = d.countryName ? d.countryName : 'unknown';
-                  const cityNm = d.city ? d.city : 'unknown';
-                  const partNm = d.part ? d.part : 'unknown';
-                  countryName.push(countryNm);
-                  cityName.push(cityNm);
-                  partName.push(partNm);
-                }
 
+                for (let i = 0; i < g.length; i++) {
+                  const d = g[i];
 
+                  //column header 세팅
+                  if(i === 0){
+                    const countryNm = d.countryName ? d.countryName : 'unknown';
+                    const cityNm = d.city ? d.city : 'unknown';
+                    const partNm = d.part ? d.part : 'unknown';
+                    countryName[colIndex] = countryNm;
+                    cityName[colIndex] = cityNm;
+                    partName[colIndex] = partNm;
+                  }
 
-
-              });
+                  const jol = this.jobOrderList;
+                  const rowIndex = _.findIndex(jol,jobId =>
+                    jobId === d.jobId
+                  );
+                  teaMemberArr[rowIndex][colIndex] = d.firstName + ' ' + d.lastName;
+              }
             }
 
             this.columnTitle = [countryName, cityName, partName];
@@ -378,23 +322,30 @@ export default {
     updated() {
 
     },
-
 }
 </script>
-<style>
-.container{
+<style scoped>
+.main-container{
+  position: relative;
+}
+
+.sub-container{
   content: "";
   display: block;
   clear: both;
-  width: 1000px;
+  width: 1227px;
+  height: 700px;
+  overflow: hidden;
   margin: 0 auto;
 }
 
-
+table td,th{
+  position: relative;
+}
 
 .sub-left-container {
   float: left;
-  width: 30%;
+  width: 400px;
   height: 700px;
 }
 
@@ -405,6 +356,7 @@ export default {
 
 .sub-left-container .sub-left-container-top {
   background-color: #f6f6f6;
+  width: 100%;
   height: 97px;
 }
 .sub-left-container .sub-left-container-top table{
@@ -413,18 +365,18 @@ export default {
 .sub-left-container .sub-left-container-top table th{
   border: 1px solid #c9c9c9;
   width: 33.33%;
+  overflow:hidden;
+  white-space : nowrap;
+  text-overflow: ellipsis;
+  position: relative;
 }
-.sub-left-container .sub-left-container-top table .main{
-  width: 100%;
-}
-.sub-left-container .sub-left-container-top table .sub{
-  width: 50%;
-}
+
 
 .sub-left-container .sub-left-container-bottom {
   height: 400px;
-  overflow-y: hidden;
+  width: 100%;
   overflow-x: scroll;
+  overflow-y: hidden;
 }
 .sub-left-container .sub-left-container-bottom::-webkit-scrollbar {
   width: 17px;
@@ -437,17 +389,23 @@ export default {
 }
 
 .sub-left-container .sub-left-container-bottom table{
+  table-layout:fixed;
   width: 100%;
 }
 .sub-left-container .sub-left-container-bottom table th{
   border: 1px solid #c9c9c9;
   width: 33.33%;
+  height: 54px;
+  overflow:hidden;
+  white-space : nowrap;
+  text-overflow: ellipsis;
+  position: relative;
 }
 
 .sub-right-container {
   position: relative;
-  float: right;
-  width: 70%;
+  float: left;
+  width: 800px;
   height: 700px;
 }
 
@@ -477,18 +435,17 @@ export default {
 }
 
 
-
 .sub-right-container .sub-right-container-top table{
-  width: 2400px;
+  width: 100%;
+  table-layout:fixed;
 }
 .sub-right-container .sub-right-container-top table th{
   border: 1px solid #c9c9c9;
-}
-.sub-right-container .sub-right-container-top table .main{
-  width: 300px;
-}
-.sub-right-container .sub-right-container-top table .sub{
-  width: 150px;
+  width: 100px;
+  overflow:hidden;
+  white-space : nowrap;
+  text-overflow: ellipsis;
+  position: relative;
 }
 
 .sub-right-container .sub-right-container-bottom {
@@ -509,10 +466,28 @@ export default {
 
 
 .sub-right-container .sub-right-container-bottom table{
-  width: 2400px;
+  width: 100%;
+  table-layout:fixed;
 }
 .sub-right-container .sub-right-container-bottom table td{
   border: 1px solid #c9c9c9;
-  width: 150px;
+  width: 100px;
+  height: 54px;
+  position: relative;
+  overflow: hidden;
+  white-space : nowrap;
+  text-overflow: ellipsis;
 }
+
+
+.t_tooltip{
+  position: absolute;
+  background-color: rgba(0,0,0,0.5);
+  color: #fff;
+  padding: 10px 7px;
+  border-radius: 10px;
+  white-space : nowrap;
+  z-index: 999;
+}
+
 </style>
