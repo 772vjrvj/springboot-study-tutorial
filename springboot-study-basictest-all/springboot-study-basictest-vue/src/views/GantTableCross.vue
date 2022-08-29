@@ -1,7 +1,8 @@
 <template>
-  <div class="main-container" @mousemove="viewTooltip">
-    <p class="t_tooltip" ref="t_tooltip">111</p>
-    <div class="sub-container">
+  <div class="main-container">
+
+    <div class="sub-container" @mousemove="viewTooltip">
+      <p class="t_tooltip" ref="t_tooltip" />
       <div class="text-start fs-4 mb-lg-5 position-relative">Team List.</div>
       <div class="row justify-content-start">
         <div class="col-auto">
@@ -49,28 +50,28 @@
                 <template v-for="(child, idx) in item.children">
                   <template v-for="(c, i) in child.children">
                     <tr v-if="idx ===0 && i===0" :key="index+idx+i">
-                      <th :rowspan="item.rowspan">
+                      <td :rowspan="item.rowspan">
                        {{item.title}}
-                      </th>
-                      <th :rowspan="child.rowspan">
+                      </td>
+                      <td :rowspan="child.rowspan">
                         {{child.title}}
-                      </th>
-                      <th :id="c.id">
+                      </td>
+                      <td :id="c.id">
                         {{c.title}}
-                      </th>
+                      </td>
                     </tr>
                     <tr v-else-if="idx !==0 && i===0" :key="idx+i">
-                      <th :rowspan="child.rowspan">
+                      <td :rowspan="child.rowspan">
                         {{item.title}}
-                      </th>
-                      <th :id="c.id">
+                      </td>
+                      <td :id="c.id">
                         {{c.title}}
-                      </th>
+                      </td>
                     </tr>
                     <tr v-if="i!==0" :key="i" >
-                      <th :id="c.id">
+                      <td :id="c.id">
                         {{c.title}}
-                      </th>
+                      </td>
                     </tr>
                   </template>
                 </template>
@@ -132,9 +133,7 @@ export default {
             ]},
           { id: 'DP', title: 'Team', children: [
             { id: 'SECTION', title: 'Section', children: [
-              { id: 'JOB', title: 'Job', children: [
-
-                ]},
+              { id: 'JOB', title: 'Job'},
             ]},
           ]},
         ], //메임 이름
@@ -146,7 +145,6 @@ export default {
         partName: [],
         teamMemberList: [],
         tooltipTimer: null
-
       }
     },
     methods: {
@@ -158,17 +156,18 @@ export default {
           this.tooltipTimer = setTimeout(() => {
             this.$refs.t_tooltip.style.display = 'block';
             this.$refs.t_tooltip.style.left = e.pageX + 'px';
-            this.$refs.t_tooltip.style.top = e.pageY - 50 + 'px';
+            this.$refs.t_tooltip.style.top = e.pageY - 30 + 'px';
             this.$refs.t_tooltip.innerText = e.target.innerText;
-            console.log('e.target.innerText : ', e.target.innerText);
           }, 1000)
-
         }
       },
 
       scrollEvent(e){
         this.$refs.subleftcontainerbottom.scrollTop = e.target.scrollTop;
         this.$refs.subrightcontainertop.scrollLeft = e.target.scrollLeft;
+
+        this.$refs.subrightcontainertopborder.style.right = -e.target.scrollLeft + 'px';
+
       },
 
       setTeam(dataList){
@@ -313,12 +312,15 @@ export default {
       }
 
     },
+
     created() {
       this.getTeamList();
     },
+
     mounted() {
 
     },
+
     updated() {
 
     },
@@ -339,38 +341,52 @@ export default {
   margin: 0 auto;
 }
 
-table td,th{
-  position: relative;
+.sub-container table{
+  width: 100%;
+  table-layout:fixed;
 }
+.sub-container table th,
+.sub-container table td{
+  border: 1px solid #c9c9c9;
+  padding: 5px;
+  font-size: 14px;
+  width: 100px;
+  overflow: hidden;
+  white-space : nowrap;
+  text-overflow: ellipsis;
+}
+.sub-container table td{
+  height: 54px;
+}
+.sub-container .t_tooltip{
+  display: none;
+  position: absolute;
+  background-color: rgba(0,0,0,0.5);
+  color: #fff;
+  padding: 4px 7px;
+  white-space : nowrap;
+  z-index: 999;
+  font-size: 14px;
+}
+
 
 .sub-left-container {
   float: left;
   width: 400px;
   height: 700px;
 }
-
-.sub-left-container table td,th{
-  padding: 5px;
-  font-size: 14px;
-}
-
 .sub-left-container .sub-left-container-top {
   background-color: #f6f6f6;
   width: 100%;
   height: 97px;
 }
 .sub-left-container .sub-left-container-top table{
-  width: 100%;
+  table-layout: initial;
 }
-.sub-left-container .sub-left-container-top table th{
-  border: 1px solid #c9c9c9;
+.sub-left-container .sub-left-container-top table th,
+.sub-left-container .sub-left-container-top table td{
   width: 33.33%;
-  overflow:hidden;
-  white-space : nowrap;
-  text-overflow: ellipsis;
-  position: relative;
 }
-
 
 .sub-left-container .sub-left-container-bottom {
   height: 400px;
@@ -378,29 +394,20 @@ table td,th{
   overflow-x: scroll;
   overflow-y: hidden;
 }
+.sub-left-container .sub-left-container-bottom table td{
+  font-weight: bold;
+}
 .sub-left-container .sub-left-container-bottom::-webkit-scrollbar {
   width: 17px;
 }
 .sub-left-container .sub-left-container-bottom::-webkit-scrollbar-track {
   background-color: rgb(255, 255, 255);
+  border-top: 1px solid #c9c9c9;
 }
 .sub-left-container .sub-left-container-bottom::-webkit-scrollbar-thumb {
   background-color: rgb(255, 255, 255);
 }
 
-.sub-left-container .sub-left-container-bottom table{
-  table-layout:fixed;
-  width: 100%;
-}
-.sub-left-container .sub-left-container-bottom table th{
-  border: 1px solid #c9c9c9;
-  width: 33.33%;
-  height: 54px;
-  overflow:hidden;
-  white-space : nowrap;
-  text-overflow: ellipsis;
-  position: relative;
-}
 
 .sub-right-container {
   position: relative;
@@ -408,13 +415,6 @@ table td,th{
   width: 800px;
   height: 700px;
 }
-
-.sub-right-container table td,th{
-  padding: 5px;
-  font-size: 14px;
-}
-
-
 .sub-right-container .sub-right-container-top {
   box-sizing: border-box;
   background-color: #f6f6f6;
@@ -424,30 +424,27 @@ table td,th{
   overflow-y: scroll;
   position: relative;
 }
+
+.sub-right-container .sub-right-container-top .sub-right-container-top-border{
+  position: absolute;
+  border-right: 1px solid #c9c9c9;
+  right: 0;
+  width: 1px;
+  height: 97px;
+  z-index: 999;
+}
+
 .sub-right-container .sub-right-container-top::-webkit-scrollbar {
   width: 17px;
 }
 .sub-right-container .sub-right-container-top::-webkit-scrollbar-track {
   background-color: rgb(255, 255, 255);
+  border-left: 1px solid #c9c9c9;
 }
+
 .sub-right-container .sub-right-container-bottom::-webkit-scrollbar-thumb {
   background-color: rgb(255, 255, 255);
 }
-
-
-.sub-right-container .sub-right-container-top table{
-  width: 100%;
-  table-layout:fixed;
-}
-.sub-right-container .sub-right-container-top table th{
-  border: 1px solid #c9c9c9;
-  width: 100px;
-  overflow:hidden;
-  white-space : nowrap;
-  text-overflow: ellipsis;
-  position: relative;
-}
-
 .sub-right-container .sub-right-container-bottom {
   height: 400px;
   width: 817px;
@@ -458,36 +455,13 @@ table td,th{
   width: 17px;
 }
 .sub-right-container .sub-right-container-bottom::-webkit-scrollbar-track {
-  background-color: white;
+  background-color: #f6f6f6;
 }
 .sub-right-container .sub-right-container-bottom::-webkit-scrollbar-thumb {
-  background-color: #eaeaea;
+  background-color: #dcdcdc;
 }
 
 
-.sub-right-container .sub-right-container-bottom table{
-  width: 100%;
-  table-layout:fixed;
-}
-.sub-right-container .sub-right-container-bottom table td{
-  border: 1px solid #c9c9c9;
-  width: 100px;
-  height: 54px;
-  position: relative;
-  overflow: hidden;
-  white-space : nowrap;
-  text-overflow: ellipsis;
-}
 
-
-.t_tooltip{
-  position: absolute;
-  background-color: rgba(0,0,0,0.5);
-  color: #fff;
-  padding: 10px 7px;
-  border-radius: 10px;
-  white-space : nowrap;
-  z-index: 999;
-}
 
 </style>
