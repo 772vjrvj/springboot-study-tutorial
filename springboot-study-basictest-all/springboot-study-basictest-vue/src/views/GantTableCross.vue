@@ -1,6 +1,5 @@
 <template>
   <div class="main-container">
-
     <div class="sub-container" @mousemove="viewTooltip">
       <p class="t_tooltip" ref="t_tooltip" />
       <div class="text-start fs-4 mb-lg-5 position-relative">Team List.</div>
@@ -43,7 +42,7 @@
             </thead>
           </table>
         </div>
-        <div class="sub-left-container-bottom" ref="subleftcontainerbottom">
+        <div class="sub-left-container-bottom" ref="subLeftContainerBottom">
           <table>
             <thead>
               <template v-for="(item, index) in subTitle" :key="index">
@@ -81,7 +80,7 @@
         </div>
       </div>
       <div class="sub-right-container">
-        <div class="sub-right-container-top" ref="subrightcontainertop">
+        <div class="sub-right-container-top" ref="subRightContainerTop">
           <table>
             <thead>
               <tr v-for="(title, index) in columnTitle" :key="index">
@@ -163,11 +162,8 @@ export default {
       },
 
       scrollEvent(e){
-        this.$refs.subleftcontainerbottom.scrollTop = e.target.scrollTop;
-        this.$refs.subrightcontainertop.scrollLeft = e.target.scrollLeft;
-
-        this.$refs.subrightcontainertopborder.style.right = -e.target.scrollLeft + 'px';
-
+        this.$refs.subLeftContainerBottom.scrollTop = e.target.scrollTop;
+        this.$refs.subRightContainerTop.scrollLeft = e.target.scrollLeft;
       },
 
       setTeam(dataList){
@@ -358,6 +354,20 @@ export default {
 .sub-container table td{
   height: 54px;
 }
+.sub-container table .last_right_t{
+  border-right: none;
+}
+.sub-container table .last_bottom_t{
+  border-bottom: 2px solid #656565;
+}
+.sub-container table .last_top_t{
+  border-bottom: none;
+}
+.sub-container table .last_left_t{
+  border-bottom: none;
+}
+
+
 .sub-container .t_tooltip{
   display: none;
   position: absolute;
@@ -379,14 +389,21 @@ export default {
   background-color: #f6f6f6;
   width: 100%;
   height: 97px;
+  border-right: 1px solid #656565;
 }
 .sub-left-container .sub-left-container-top table{
   table-layout: initial;
 }
-.sub-left-container .sub-left-container-top table th,
-.sub-left-container .sub-left-container-top table td{
+.sub-left-container .sub-left-container-top table th{
   width: 33.33%;
 }
+.sub-left-container .sub-left-container-top table th:last-child{
+  border-right: none;
+}
+.sub-left-container .sub-left-container-top table tr:last-child th{
+  border-bottom: 1px solid #656565;
+}
+
 
 .sub-left-container .sub-left-container-bottom {
   height: 400px;
@@ -397,6 +414,17 @@ export default {
 .sub-left-container .sub-left-container-bottom table td{
   font-weight: bold;
 }
+.sub-left-container .sub-left-container-bottom table td:last-child{
+  border-right: 1px solid #656565;
+}
+.sub-left-container .sub-left-container-bottom table tr:first-child td{
+  border-top: none;
+}
+.sub-left-container .sub-left-container-bottom table tr:last-child td{
+  border-bottom: none;
+}
+
+
 .sub-left-container .sub-left-container-bottom::-webkit-scrollbar {
   width: 17px;
 }
@@ -424,14 +452,14 @@ export default {
   overflow-y: scroll;
   position: relative;
 }
-
-.sub-right-container .sub-right-container-top .sub-right-container-top-border{
-  position: absolute;
-  border-right: 1px solid #c9c9c9;
-  right: 0;
-  width: 1px;
-  height: 97px;
-  z-index: 999;
+.sub-right-container .sub-right-container-top table tr th:first-child {
+  border-left: none;
+}
+.sub-right-container .sub-right-container-top table tr th:last-child{
+  border-right: none;
+}
+.sub-right-container .sub-right-container-top table tr:last-child th{
+  border-bottom: 1px solid #656565;
 }
 
 .sub-right-container .sub-right-container-top::-webkit-scrollbar {
@@ -442,23 +470,37 @@ export default {
   border-left: 1px solid #c9c9c9;
 }
 
-.sub-right-container .sub-right-container-bottom::-webkit-scrollbar-thumb {
-  background-color: rgb(255, 255, 255);
-}
 .sub-right-container .sub-right-container-bottom {
   height: 400px;
   width: 817px;
   overflow: scroll;
 }
+.sub-right-container .sub-right-container-bottom table tr:first-child td {
+  border-top: none;
+}
+.sub-right-container .sub-right-container-bottom table tr:last-child td {
+  border-bottom: none;
+}
+.sub-right-container .sub-right-container-bottom table tr td:first-child  {
+  border-left: none;
+}
+.sub-right-container .sub-right-container-bottom table tr td:last-child  {
+  border-right: none;
+}
 
 .sub-right-container .sub-right-container-bottom::-webkit-scrollbar {
   width: 17px;
 }
-.sub-right-container .sub-right-container-bottom::-webkit-scrollbar-track {
-  background-color: #f6f6f6;
-}
 .sub-right-container .sub-right-container-bottom::-webkit-scrollbar-thumb {
   background-color: #dcdcdc;
+}
+.sub-right-container .sub-right-container-bottom::-webkit-scrollbar-track:vertical {
+  border-left: 1px solid #c9c9c9;
+  background-color: #f6f6f6;
+}
+.sub-right-container .sub-right-container-bottom::-webkit-scrollbar-track:horizontal {
+  border-top: 1px solid #c9c9c9;
+  background-color: #f6f6f6;
 }
 
 
