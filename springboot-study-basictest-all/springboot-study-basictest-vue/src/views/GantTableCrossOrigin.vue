@@ -55,7 +55,7 @@
                       <td :rowspan="child.rowspan">
                         {{child.title}}
                       </td>
-                      <td :id="c.id" @click="jobClick(c.id)" ref="lastTd">
+                      <td :id="c.id">
                         {{c.title}}
                       </td>
                     </tr>
@@ -63,12 +63,12 @@
                       <td :rowspan="child.rowspan">
                         {{item.title}}
                       </td>
-                      <td :id="c.id" @click="jobClick(c.id)" ref="lastTd">
+                      <td :id="c.id">
                         {{c.title}}
                       </td>
                     </tr>
                     <tr v-if="i!==0" :key="i" >
-                      <td :id="c.id" @click="jobClick(c.id)" ref="lastTd">
+                      <td :id="c.id">
                         {{c.title}}
                       </td>
                     </tr>
@@ -84,26 +84,19 @@
           <table>
             <thead>
               <tr v-for="(title, index) in columnTitle" :key="index">
-                <template v-if="columnTitle.length - 1 !== index">
-                  <th v-for="(name, idx) in title" :key="idx">
-                    {{name}}
-                  </th>
-                </template>
-                <template v-else>
-                  <th  v-for="(name, idx) in title" :key="idx" ref="rightTopTh" @click="teamClick(idx)">
-                    {{name}}
-                  </th>
-                </template>
+                <th v-for="(name, idx) in title" :key="idx">
+                 {{name}}
+                </th>
               </tr>
             </thead>
           </table>
         </div>
-        <div class="sub-right-container-bottom" ref="subRightContainerBottom" @scroll="scrollEvent">
+        <div class="sub-right-container-bottom" @scroll="scrollEvent">
           <table>
             <tbody>
-              <tr v-for="(member, index) in teamMemberList" :key="index" ref="rightBottomTr" :id="member[0].id">
-                <td v-for="(m, i) in member" :key="i" :id="m.id" ref="rightBottomTd">
-                  {{m.name}}
+              <tr v-for="(member, index) in teamMemberList" :key="index">
+                <td v-for="(m, i) in member" :key="i" >
+                  {{m}}
                 </td>
               </tr>
             </tbody>
@@ -154,50 +147,6 @@ export default {
       }
     },
     methods: {
-
-      teamClick(idx){
-        console.log(idx);
-        let ths = this.$refs.rightTopTh;
-
-        _.each(ths, (th,i) => {
-          if(i === idx){
-            if(th.classList.contains('active')){
-              th.classList.remove('active');
-            }else{
-              th.classList.add('active');
-            }
-          }
-        });
-
-
-      },
-
-      jobClick(id){
-        //let trs = this.$refs.subRightContainerBottom.firstChild.firstChild.childNodes;
-        let trs = this.$refs.rightBottomTr;
-        //let tds = document.querySelectorAll('.lastTd');
-        let tds = this.$refs.lastTd;
-
-        _.each(tds, td => {
-          if(td.id === id){
-            if(td.classList.contains('active')){
-              td.classList.remove('active');
-            }else{
-              td.classList.add('active');
-            }
-          }
-        });
-
-        _.each(trs, tr => {
-          if(tr.id === id){
-            if(tr.classList.contains('active')){
-              tr.classList.remove('active');
-            }else{
-              tr.classList.add('active');
-            }
-          }
-        });
-      },
 
       viewTooltip(e){
         clearTimeout(this.tooltipTimer);
@@ -339,12 +288,7 @@ export default {
                   const rowIndex = _.findIndex(jol,jobId =>
                     jobId === d.jobId
                   );
-                  teaMemberArr[rowIndex][colIndex] = {
-                    name : d.firstName + ' ' + d.lastName,
-                    id: d.jobId
-                  }
-
-
+                  teaMemberArr[rowIndex][colIndex] = d.firstName + ' ' + d.lastName;
               }
             }
 
@@ -407,14 +351,6 @@ export default {
   white-space : nowrap;
   text-overflow: ellipsis;
 }
-.sub-container table th:hover{
-  background-color: #f6f6f6;
-}
-
-.sub-container table td:hover{
-  background-color: #f6f6f6;
-}
-
 .sub-container table td{
   height: 54px;
 }
@@ -478,11 +414,6 @@ export default {
 .sub-left-container .sub-left-container-bottom table td{
   font-weight: bold;
 }
-.sub-left-container .sub-left-container-bottom table tr td.active{
-  background-color: rgba(166, 212, 245, 0.8);
-}
-
-
 .sub-left-container .sub-left-container-bottom table td:last-child{
   border-right: 1px solid #656565;
 }
@@ -531,11 +462,6 @@ export default {
   border-bottom: 1px solid #656565;
 }
 
-.sub-right-container .sub-right-container-top table tr th.active{
-  background-color: rgba(166, 212, 245, 0.8);
-}
-
-
 .sub-right-container .sub-right-container-top::-webkit-scrollbar {
   width: 17px;
 }
@@ -549,11 +475,6 @@ export default {
   width: 817px;
   overflow: scroll;
 }
-
-.sub-right-container .sub-right-container-bottom table tr.active{
-  background-color: rgba(166, 212, 245, 0.8);
-}
-
 .sub-right-container .sub-right-container-bottom table tr:first-child td {
   border-top: none;
 }
