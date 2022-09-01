@@ -55,7 +55,7 @@
                       <td :rowspan="child.rowspan">
                         {{child.title}}
                       </td>
-                      <td :id="c.id" @click="jobClick(c)" :class="{'active': c.active}">
+                      <td :id="c.id" @click="jobClick(c.id)" ref="lastTd">
                         {{c.title}}
                       </td>
                     </tr>
@@ -63,12 +63,12 @@
                       <td :rowspan="child.rowspan">
                         {{item.title}}
                       </td>
-                      <td :id="c.id" @click="jobClick(c)" :class="{'active': c.active}">
+                      <td :id="c.id" @click="jobClick(c.id)" ref="lastTd">
                         {{c.title}}
                       </td>
                     </tr>
                     <tr v-if="i!==0" :key="i" >
-                      <td :id="c.id" @click="jobClick(c)" :class="{'active': c.active}">
+                      <td :id="c.id" @click="jobClick(c.id)" ref="lastTd">
                         {{c.title}}
                       </td>
                     </tr>
@@ -85,13 +85,13 @@
             <thead>
               <tr v-for="(title, index) in columnTitle" :key="index">
                 <template v-if="columnTitle.length - 1 !== index">
-                  <th v-for="(t, idx) in title" :key="idx" :class="{active: t.active}">
-                    {{t.name}}
+                  <th v-for="(name, idx) in title" :key="idx">
+                    {{name}}
                   </th>
                 </template>
                 <template v-else>
-                  <th  v-for="(t, idx) in title" :key="idx" @click="partClick(t, idx)" :class="{active: t.active}">
-                    {{t.name}}
+                  <th  v-for="(name, idx) in title" :key="idx" ref="rightTopTh" @click="teamClick(idx)">
+                    {{name}}
                   </th>
                 </template>
               </tr>
@@ -101,8 +101,8 @@
         <div class="sub-right-container-bottom" ref="subRightContainerBottom" @scroll="scrollEvent">
           <table>
             <tbody>
-              <tr v-for="(member, index) in teamMemberList" :key="index" :id="member[0].id">
-                <td v-for="(m, i) in member" :key="i" :id="m.id" :data-index="i" :class="{'active': m.active}">
+              <tr v-for="(member, index) in teamMemberList" :key="index" ref="rightBottomTr" :id="member[0].id">
+                <td v-for="(m, i) in member" :key="i" :id="m.id" :data-index="i" ref="rightBottomTd">
                   {{m.name}}
                 </td>
               </tr>
@@ -155,24 +155,62 @@ export default {
     },
     methods: {
 
-      partClick(t, idx){
-        t.active = !t.active;
-        _.map(this.teamMemberList, member => {
-          member[idx].active = !member[idx].active;
-          return member;
+      teamClick(idx){
+        let rightTopThs = this.$refs.rightTopTh;
+        let rightBottomTds = this.$refs.rightBottomTd;
+
+        _.each(rightTopThs, (th, i) => {
+          if(i === idx){
+            if(th.classList.contains('active')){
+              th.classList.remove('active');
+            }else{
+              th.classList.add('active');
+            }
+          }
         });
+
+        _.each(rightBottomTds, td => {
+          const i = td.dataset.index;
+
+
+          if(i == idx){
+            console.log('i : ',i);
+            if(td.classList.contains('active')){
+              td.classList.remove('active');
+            }else{
+              td.classList.add('active');
+            }
+          }
+        });
+
+
+
       },
 
-      jobClick(c){
-        c.active = !c.active;
-         _.map(this.teamMemberList, member => {
-          if(member[0].id === c.id){
-            _.map(member, m => {
-              m.active = !m.active;
-              return m;
-            });
+      jobClick(id){
+        //let trs = this.$refs.subRightContainerBottom.firstChild.firstChild.childNodes;
+        let trs = this.$refs.rightBottomTr;
+        //let tds = document.querySelectorAll('.lastTd');
+        let tds = this.$refs.lastTd;
+
+        _.each(tds, td => {
+          if(td.id === id){
+            if(td.classList.contains('active')){
+              td.classList.remove('active');
+            }else{
+              td.classList.add('active');
+            }
           }
-          return member;
+        });
+
+        _.each(trs, tr => {
+          if(tr.id === id){
+            if(tr.classList.contains('active')){
+              tr.classList.remove('active');
+            }else{
+              tr.classList.add('active');
+            }
+          }
         });
       },
 
@@ -207,8 +245,7 @@ export default {
             jobId: data.jobId,
             jobTitle: data.jobTitle,
             sectionId: data.sectionId,
-            sectionName: data.sectionName,
-            active : false
+            sectionName: data.sectionName
           }
           if(index > -1){
             team[index].children.push(childObj);
@@ -218,8 +255,7 @@ export default {
               id: data.teamId,
               title: data.teamName,
               rowspan: 1,
-              children: [childObj],
-              active: false
+              children: [childObj]
             }
             team.push(obj);
           }
@@ -238,7 +274,6 @@ export default {
             const childObj = {
               id: child.jobId,
               title: child.jobTitle,
-              active: false
             }
             if(index > -1){
               sectionList[index].children.push(childObj);
@@ -248,8 +283,7 @@ export default {
                 id: child.sectionId,
                 title: child.sectionName,
                 rowspan: 1,
-                children: [childObj],
-                active: false,
+                children: [childObj]
               }
               sectionList.push(obj);
             }
@@ -263,6 +297,7 @@ export default {
         return axios.get(this.url.teamList).then(res => {
           if(res && res.status === 200 && res.data){
             const data = res.data;
+            console.log('setTeamList data : ',data);
             let team = this.setTeam(data);
             team = this.setSection(team);
             this.subTitle = team;
@@ -310,9 +345,9 @@ export default {
                     const countryNm = d.countryName ? d.countryName : 'unknown';
                     const cityNm = d.city ? d.city : 'unknown';
                     const partNm = d.part ? d.part : 'unknown';
-                    countryName[colIndex] = {name : countryNm, active: false};
-                    cityName[colIndex] = {name : cityNm, active: false};
-                    partName[colIndex] = {name : partNm, active: false};
+                    countryName[colIndex] = countryNm;
+                    cityName[colIndex] = cityNm;
+                    partName[colIndex] = partNm;
                   }
 
                   const jol = this.jobOrderList;
@@ -322,9 +357,9 @@ export default {
                   teaMemberArr[rowIndex][colIndex] = {
                     name : d.firstName + ' ' + d.lastName,
                     id: d.jobId,
-                    active: false,
-                    over: false
                   }
+
+
               }
             }
 
@@ -339,8 +374,8 @@ export default {
       },
 
       async getTeamList(){
-        this.setTeamList();
-        this.setMemberList();
+        await this.setTeamList();
+        await this.setMemberList();
       }
 
     },
@@ -523,9 +558,14 @@ export default {
   overflow: scroll;
 }
 
+.sub-right-container .sub-right-container-bottom table tr.active{
+  background-color: rgba(166, 212, 245, 0.8);
+}
+
 .sub-right-container .sub-right-container-bottom table tr td.active{
   background-color: rgba(166, 212, 245, 0.8);
 }
+
 
 .sub-right-container .sub-right-container-bottom table tr:first-child td {
   border-top: none;
@@ -556,9 +596,9 @@ export default {
 }
 
 
-.sub-container table th:hover{
-  background-color: #c7c7c7;
-}
+/*.sub-container table th:hover{*/
+/*  background-color: #f6f6f6;*/
+/*}*/
 
 /*.sub-container table td:hover{*/
 /*  background-color: #f6f6f6;*/
