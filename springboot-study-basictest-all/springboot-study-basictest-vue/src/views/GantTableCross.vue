@@ -1,14 +1,22 @@
 <template>
   <div class="main-container">
+    <div id="loading-spinner"  class="d-flex justify-content-center">
+      <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
     <div class="sub-container" @mousemove="viewTooltip">
       <p class="t_tooltip" ref="t_tooltip" />
       <div class="text-start fs-4 mb-lg-5 position-relative">Team List.</div>
       <div class="row justify-content-start">
         <div class="col-auto">
-          <div class="pt-1"><span>Total Row : </span></div>
+          <div class="pt-1 mb-2 me-lg-5"><span>Total Member : {{totalMember}}</span></div>
         </div>
         <div class="col-auto">
-          <div class="pt-1"><span>Total Team : </span></div>
+          <div class="pt-1 mb-2 me-lg-5"><span>Total Job : {{totalJob}}</span></div>
+        </div>
+        <div class="col-auto">
+          <div class="pt-1 mb-2 me-lg-5"><span>Total Part : {{totalPart}}</span></div>
         </div>
       </div>
       <div class="sub-left-container">
@@ -126,8 +134,9 @@ export default {
           teamList: '/team/list',
           memberList: '/team/member'
         },
-
-
+        totalMember: 0,
+        totalJob: 0,
+        totalPart: 0,
         mainTitle: [
           { id: 'LOC',   title: 'Location', rowspan: 2, colspan: 2,  children: [
             { id: 'CT',   title: 'Country',   children: [
@@ -183,7 +192,7 @@ export default {
           this.tooltipTimer = setTimeout(() => {
             this.$refs.t_tooltip.style.display = 'block';
             this.$refs.t_tooltip.style.left = e.pageX + 'px';
-            this.$refs.t_tooltip.style.top = e.pageY - 30 + 'px';
+            this.$refs.t_tooltip.style.top = e.pageY - 80 + 'px';
             this.$refs.t_tooltip.innerText = e.target.innerText;
           }, 1000)
         }
@@ -263,6 +272,7 @@ export default {
         return axios.get(this.url.teamList).then(res => {
           if(res && res.status === 200 && res.data){
             const data = res.data;
+            this.totalJob = data.length;
             let team = this.setTeam(data);
             team = this.setSection(team);
             this.subTitle = team;
@@ -279,7 +289,8 @@ export default {
         axios.get(this.url.memberList).then(res => {
           if(res && res.status === 200 && res.data){
             const data = res.data;
-
+            console.log('data : ', data);
+            this.totalMember = data.length;
             let grp = _.groupBy(data, 'locationId');
 
             const grpKeys = _.keys(grp);
@@ -333,6 +344,8 @@ export default {
             this.cityName = cityName;
             this.partName = partName;
 
+            this.totalPart = teaMemberArr[0].length;
+
             this.teamMemberList = teaMemberArr;
           }
         })
@@ -360,8 +373,15 @@ export default {
 </script>
 <style scoped>
 .main-container{
+  height: 100vh;
   position: relative;
 }
+
+#loading-spinner{
+  position: absolute;
+}
+
+
 
 .sub-container{
   content: "";
@@ -557,11 +577,11 @@ export default {
 
 
 .sub-container table th:hover{
-  background-color: #c7c7c7;
+  background-color: #c7c7c7 !important;
 }
 
-/*.sub-container table td:hover{*/
-/*  background-color: #f6f6f6;*/
-/*}*/
+.sub-container table td:hover{
+  background-color: #f6f6f6 !important;
+}
 
 </style>
