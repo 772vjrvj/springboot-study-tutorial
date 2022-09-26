@@ -129,7 +129,8 @@
 
     <!-- HREmployeeList-->
     <sql id="HREmployeeSelect">
-        SELECT E.EMPLOYEE_ID,
+        SELECT
+               E.EMPLOYEE_ID,
                E.FIRST_NAME,
                E.LAST_NAME,
                E.EMAIL,
@@ -151,13 +152,13 @@
 
     <!-- 싱글 검색 -->
     <select id="HREmployeeList" resultType="HREmployeeVO">
-        SELECT ROW_NUMBER() OVER(ORDER BY FIRST_NAME ASC, LAST_NAME ASC) ROW_NUM, E.*
+        SELECT ROW_NUMBER() OVER(ORDER BY E.FIRST_NAME ASC, E.LAST_NAME ASC) ROW_NUM, E.*
         FROM (
             <include refid="HREmployeeSelect" />
             <include refid="singleSearch" />
             <include refid="noSearch" />
-            <include refid="common.sql.pageOffset"/>
         ) E
+        <include refid="common.sql.pageOffset"/>
     </select>
 
     <!-- 싱글 count -->
@@ -205,8 +206,8 @@
                D.DEPARTMENT_NAME
         FROM EMPLOYEES E, EMPLOYEES M, DEPARTMENTS D
         WHERE 1=1
-          AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
-          AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
+              AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
+              AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
         <include refid="multiSearch" />
         <include refid="common.sql.pageOffset"/>
     </select>

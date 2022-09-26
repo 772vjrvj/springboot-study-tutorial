@@ -1,12 +1,13 @@
 <template>
-  <div class = "container">
+  <div class = "container employeeList-container">
+    <LoadingSpinner :is-loading="isLoading" />
     <div class="text-start fs-4 mb-lg-5 position-relative"> Employees List.</div>
     <div class="row justify-content-between">
       <div class="col-auto">
         <b-form-select
             @change="selectRowChange"
             id="inline-form-custom-select-pref"
-            class="mb-2"
+            class="mb-2 ms-2"
             :options="rowCountList"
             v-model="pageObject.perPageRow"
             value-field="item"
@@ -68,8 +69,6 @@
         </div>
       </div>
     </div>
-
-
     <b-table striped hover responsive
              :fields="fields"
              :items="employees"
@@ -98,7 +97,6 @@
         {{ data.item.managerFirstName }} {{ data.item.managerLastName }}
       </template>
     </b-table>
-
     <div class="row justify-content-center">
       <div class="col-auto">
         <b-form-select
@@ -144,22 +142,24 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
 import HREmployeeService from '../services/HREmployeeService'
+import LoadingSpinner from '../components/util/LoadingSpinner'
 import {BIconFunnel, BIconFunnelFill} from 'bootstrap-icons-vue'
 
 export default {
   name: 'BootVueHREmployeeList',
   components: {
     BIconFunnel,
-    BIconFunnelFill
+    BIconFunnelFill,
+    LoadingSpinner
   },
   data(){
     return {
+      isLoading: true,
       employees : [],
       fields: [
         {key:'rowNum', label:'No.'},
@@ -223,15 +223,13 @@ export default {
   },
   methods: {
     getHREmployees(page = 1){
-      if(page){
         this.pageObject.page = page;
-        HREmployeeService.getHREmployees(page, this.pageObject.perPageRow, this.pageObject.perGroupPage, this.selectEmpCol, this.searchInput, this.noDataSelected).then((response) => {
+        return HREmployeeService.getHREmployees(page, this.pageObject.perPageRow, this.pageObject.perGroupPage, this.selectEmpCol, this.searchInput, this.noDataSelected).then((response) => {
           // if(response && response.data){
           //   this.employees = response.data.employeeList;
           //   this.pageObject = response.data.pageObject;
           // }
           // 화면에서 처리
-          console.log('response ; ', response);
           if(response && response.data && response.data.length > 0){
             this.employees = response.data;
             //화면에서 page를 만들어 보겠다.
@@ -246,7 +244,8 @@ export default {
             this.pageObject.nextPage  = this.pageObject.page !== this.pageObject.totalPage;         // 다음 페이지 존재 여부
             this.pageObject.firstPage = this.pageObject.perGroupPage < this.pageObject.page;        // 처음 페이지 존재 여부
             this.pageObject.lastPage  = this.pageObject.endPage < this.pageObject.totalPage;        // 마지막 페이지 존재 여부
-          }else{
+          }
+          else{
             this.employees = [];
             this.pageObject.totalRow  = 0;
             this.pageObject.totalPage = 0;
@@ -258,25 +257,35 @@ export default {
             this.pageObject.firstPage = false;
             this.pageObject.lastPage  = false;
           }
+        }).catch(e => {
+          console.log('error : ',e);
+        }).finally(() => {
+          console.log('getHREmployees');
+          return true;
         })
-      }
     },
-    selectRowChange(e){
+    async selectRowChange(e){
       if(e === 0) return;             // 0 이면 호출하지 않는다.
       this.pageObject.perPageRow = e; // 선택된 option값을 넣어준다.
-      this.getHREmployees(1);    // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+      this.isLoading = true;
+      await this.getHREmployees(1);    // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+      this.isLoading = false;
     },
-    selectPageChange(e){
+    async selectPageChange(e){
       if(e === 0) return;             // 0 이면 호출하지 않는다.
       this.pageObject.perGroupPage = e;
-      this.getHREmployees(1);                      // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+      this.isLoading = true;
+      await this.getHREmployees(1);                      // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+      this.isLoading = false;
     },
-    onInputPage(){
+    async onInputPage(){
       if(this.inputPage){
         const page = Number(this.inputPage.trim());
         if(!Number.isNaN(page) && page > 0){
           const perPage = page > this.pageObject.totalPage ? this.pageObject.totalPage : page;
-          this.getHREmployees(perPage);
+          this.isLoading = true;
+          await this.getHREmployees(perPage);
+          this.isLoading = false;
           this.inputPage = perPage;
         }else{
           alert('유효한 값이 아닙니다.');
@@ -284,20 +293,27 @@ export default {
       }
     },
     getHREmplColList(){
-      HREmployeeService.getHREmplColList().then((res) => {
+      return HREmployeeService.getHREmplColList().then((res) => {
         if(res && res.data){
           this.empColList = this.empColList.concat(res.data);
         }
-      })
+      }).catch(e => {
+        console.log('error : ',e);
+      }).finally(() => {
+        console.log('getHREmplColList');
+        return true;
+      });
     },
-    searchChange(e){
+    async searchChange(e){
       this.selectEmpCol = e;
       if(e === 'search'){
         this.searchInput = '';
-        this.getHREmployees(1);                      // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+        this.isLoading = true;
+        await this.getHREmployees(1);                      // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+        this.isLoading = false;
       }
     },
-    searchEmpCol(){
+    async searchEmpCol(){
       if(this.selectEmpCol && this.searchInput){
         if(this.selectEmpCol === 'managerId' || this.selectEmpCol ===  'employeeId' || this.selectEmpCol === 'commissionPct'
             || this.selectEmpCol === 'salary' ||this.selectEmpCol === 'departmentId'){
@@ -307,11 +323,15 @@ export default {
             return;
           }
         }
-        this.getHREmployees(1);
+        this.isLoading = true;
+        await this.getHREmployees(1);
+        this.isLoading = false;
       }
     },
-    pagination(){
-      this.getHREmployees(this.pageObject.page);
+    async pagination(){
+      this.isLoading = true;
+      await this.getHREmployees(this.pageObject.page);
+      this.isLoading = false;
     },
     resetModal(e) {
       console.log('show hide state : ',e);
@@ -322,14 +342,21 @@ export default {
     handleSubmit() {
       // Push the name to submitted names
       console.log('etcSearchSelected', this.etcSearchSelected);
+    },
+    async getEmploy(){
+      this.isLoading = true;
+      await this.getHREmplColList();
+      await this.getHREmployees();
+      this.isLoading = false;
     }
   },
   created() {
-    this.getHREmplColList();
-    this.getHREmployees();
+    this.getEmploy();
   }
 }
 </script>
 <style scoped>
-
+  .employeeList-container{
+    position: relative;
+  }
 </style>

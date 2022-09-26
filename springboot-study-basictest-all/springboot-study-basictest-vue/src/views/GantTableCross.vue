@@ -1,10 +1,6 @@
 <template>
   <div class="main-container">
-    <div id="loading-spinner"  class="d-flex justify-content-center">
-      <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
+    <LoadingSpinner :is-loading="isLoading" />
     <div class="sub-container" @mousemove="viewTooltip">
       <p class="t_tooltip" ref="t_tooltip" />
       <div class="text-start fs-4 mb-lg-5 position-relative">Team List.</div>
@@ -125,11 +121,16 @@
 <script>
 import _ from "lodash"
 import axios from 'axios'
+import LoadingSpinner from '../components/util/LoadingSpinner'
 
 export default {
     name: 'GantChartTest',
+    components: {
+      LoadingSpinner
+    },
     data(){
       return {
+        isLoading: false,
         url: {
           teamList: '/team/list',
           memberList: '/team/member'
@@ -276,20 +277,18 @@ export default {
             let team = this.setTeam(data);
             team = this.setSection(team);
             this.subTitle = team;
-            return team;
           }
         }).catch(e => {
           console.log('error : ',e);
         }).finally(() => {
-
+          return true;
         })
       },
 
       setMemberList(){
-        axios.get(this.url.memberList).then(res => {
+        return axios.get(this.url.memberList).then(res => {
           if(res && res.status === 200 && res.data){
             const data = res.data;
-            console.log('data : ', data);
             this.totalMember = data.length;
             let grp = _.groupBy(data, 'locationId');
 
@@ -348,12 +347,18 @@ export default {
 
             this.teamMemberList = teaMemberArr;
           }
+        }).catch(e => {
+          console.log('error : ',e);
+        }).finally(() => {
+          return true;
         })
       },
 
       async getTeamList(){
-        this.setTeamList();
-        this.setMemberList();
+        this.isLoading = true;
+        await this.setTeamList();
+        await this.setMemberList();
+        this.isLoading = false;
       }
 
     },
@@ -362,26 +367,21 @@ export default {
       this.getTeamList();
     },
 
-    mounted() {
-
-    },
-
-    updated() {
-
-    },
 }
 </script>
 <style scoped>
 .main-container{
-  height: 100vh;
+  height: 700px;
   position: relative;
 }
 
 #loading-spinner{
   position: absolute;
+  background-color: #ffffff;
+  z-index: 999;
+  height: 700px;
+  width: 100%;
 }
-
-
 
 .sub-container{
   content: "";
