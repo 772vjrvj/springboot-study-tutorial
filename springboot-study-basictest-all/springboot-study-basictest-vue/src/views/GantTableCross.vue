@@ -1,6 +1,5 @@
 <template>
   <div class="main-container">
-    <LoadingSpinner :is-loading="isLoading" />
     <div class="sub-container" @mousemove="viewTooltip">
       <p class="t_tooltip" ref="t_tooltip" />
       <div class="text-start fs-4 mb-lg-5 position-relative">Team List.</div>
@@ -121,16 +120,14 @@
 <script>
 import _ from "lodash"
 import axios from 'axios'
-import LoadingSpinner from '../components/util/LoadingSpinner'
 
 export default {
     name: 'GantChartTest',
     components: {
-      LoadingSpinner
+
     },
     data(){
       return {
-        isLoading: false,
         url: {
           teamList: '/team/list',
           memberList: '/team/member'
@@ -355,32 +352,22 @@ export default {
       },
 
       async getTeamList(){
-        this.isLoading = true;
+        this.$main.loading.show();
         await this.setTeamList();
         await this.setMemberList();
-        this.isLoading = false;
+        this.$main.loading.hide();
       }
 
     },
-
     created() {
       this.getTeamList();
     },
-
 }
 </script>
 <style scoped>
 .main-container{
   height: 700px;
   position: relative;
-}
-
-#loading-spinner{
-  position: absolute;
-  background-color: #ffffff;
-  z-index: 999;
-  height: 700px;
-  width: 100%;
 }
 
 .sub-container{

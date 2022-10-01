@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.springbootstudybasictest.mapper.HREmployeeMapper">
-    <!-- 다중 검색 조회 조건 -->
+    <!-- 다중 검색 조회 조건 현재 사용 X-->
     <sql id="multiSearch">
         <bind name="employeeId" value="'%'+hrEmployeeVO.employeeId+'%'"/>
         <bind name="firstName" value="'%'+hrEmployeeVO.firstName+'%'"/>
@@ -108,6 +108,82 @@
         </if>
     </sql>
 
+    <sql id="sorting">
+        <if test="sorting !=null and sorting != ''">
+            <!-- 2글자 이상인 경우 : String 취급, 한 글자인 경우:char 취급 => toString()를 이용해서 문자열(string)로 -->
+            <if test="sorting == 'employeeId_desc'">
+                ORDER BY E.EMPLOYEE_ID DESC
+            </if>
+            <if test="sorting == 'employeeId_asc'">
+                ORDER BY E.EMPLOYEE_ID ASC
+            </if>
+
+            <if test="sorting == 'name_desc'">
+                ORDER BY E.FIRST_NAME DESC, E.LAST_NAME DESC
+            </if>
+            <if test="sorting == 'name_asc'">
+                ORDER BY E.FIRST_NAME ASC, E.LAST_NAME ASC
+            </if>
+
+            <if test="sorting == 'email_desc'">
+                ORDER BY E.EMAIL DESC
+            </if>
+            <if test="sorting == 'email_asc'">
+                ORDER BY E.EMAIL ASC
+            </if>
+
+            <if test="sorting == 'phoneNumber_desc'">
+                ORDER BY E.PHONE_NUMBER DESC
+            </if>
+            <if test="sorting == 'phoneNumber_asc'">
+                ORDER BY E.PHONE_NUMBER ASC
+            </if>
+
+            <if test="sorting == 'hireDate_desc'">
+                ORDER BY E.HIRE_DATE DESC
+            </if>
+            <if test="sorting == 'hireDate_asc'">
+                ORDER BY E.HIRE_DATE ASC
+            </if>
+
+            <if test="sorting == 'jobId_desc'">
+                ORDER BY E.JOB_ID DESC
+            </if>
+            <if test="sorting == 'jobId_asc'">
+                ORDER BY E.JOB_ID ASC
+            </if>
+
+            <if test="sorting == 'salary_desc'">
+                ORDER BY E.SALARY DESC
+            </if>
+            <if test="sorting == 'salary_asc'">
+                ORDER BY E.SALARY ASC
+            </if>
+
+            <if test="sorting == 'commissionPct_desc'">
+                ORDER BY E.COMMISSION_PCT DESC
+            </if>
+            <if test="sorting == 'commissionPct_asc'">
+                ORDER BY E.COMMISSION_PCT ASC
+            </if>
+
+            <if test="sorting == 'manager_desc'">
+                ORDER BY E.MANAGER_FIRST_NAME DESC, E.MANAGER_LAST_NAME DESC
+            </if>
+            <if test="sorting == 'manager_asc'">
+                ORDER BY E.MANAGER_FIRST_NAME ASC, E.MANAGER_LAST_NAME ASC
+            </if>
+
+            <if test="sorting == 'departmentName_desc'">
+                ORDER BY E.DEPARTMENT_NAME DESC
+            </if>
+            <if test="sorting == 'departmentName_asc'">
+                ORDER BY E.DEPARTMENT_NAME ASC
+            </if>
+
+        </if>
+    </sql>
+
     <!-- commision, manager, department null 값 조회-->
     <sql id="noSearch">
         <if test="commissionNo == 1 or managerNo == 1 or departmentNo == 1">
@@ -158,6 +234,7 @@
             <include refid="singleSearch" />
             <include refid="noSearch" />
         ) E
+        <include refid="sorting" />
         <include refid="common.sql.pageOffset"/>
     </select>
 
@@ -187,7 +264,7 @@
         SELECT 'departmentName' as key, 'DEPARTMENT NAME' as value  FROM DUAL
     </select>
 
-    <!-- 다중 검색 list -->
+    <!-- 다중 검색 list 현재 사용 X-->
     <select id="HREmployeeMultiSearchList" parameterType="HashMap" resultType="HREmployeeVO">
         SELECT ROW_NUMBER() OVER(ORDER BY E.FIRST_NAME ASC, E.LAST_NAME ASC) ROW_NUM,
                E.EMPLOYEE_ID,
@@ -212,7 +289,7 @@
         <include refid="common.sql.pageOffset"/>
     </select>
 
-    <!-- 다중 검색 total count -->
+    <!-- 다중 검색 total count 현재 사용 X-->
     <select id="HREmployeeMultiSearchTotCnt" parameterType="HashMap" resultType="Integer">
         SELECT COUNT(*) AS TOTAL_COUNT
         FROM EMPLOYEES E, EMPLOYEES M, DEPARTMENTS D
@@ -221,6 +298,5 @@
         AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
         <include refid="multiSearch" />
     </select>
-
 
 </mapper>

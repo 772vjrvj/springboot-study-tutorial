@@ -27,7 +27,7 @@ public class HREmployeeService {
 //    }
 
     // 페이징 프론트 처리용
-    public List<HREmployeeVO> HREmployeeList(PageObject pageObject, String key, String value, String commissionNo, String managerNo, String departmentNo) {
+    public List<HREmployeeVO> HREmployeeList(PageObject pageObject, String key, String value, String commissionNo, String managerNo, String departmentNo, String sorting) {
         HashMap<String, Object> paramObj = new HashMap<>();
         paramObj.put("pageObject", pageObject);
         paramObj.put("key", key);
@@ -35,6 +35,7 @@ public class HREmployeeService {
         paramObj.put("commissionNo", commissionNo);
         paramObj.put("managerNo", managerNo);
         paramObj.put("departmentNo", departmentNo);
+        paramObj.put("sorting", sorting);
         int totalCount = mapper.HREmployeeTotCnt(paramObj);
         List<HREmployeeVO> employeeList = mapper.HREmployeeList(paramObj);
         if(!CollectionUtils.isEmpty(employeeList)){

@@ -1,6 +1,5 @@
 <template>
   <div class = "container employeeList-container">
-    <LoadingSpinner :is-loading="isLoading" />
     <div class="text-start fs-4 mb-lg-5 position-relative"> Employees List.</div>
     <div class="row justify-content-between">
       <div class="col-auto">
@@ -19,28 +18,9 @@
         <div class="pt-1"><span>Total Row : {{this.pageObject.totalRow}}</span></div>
       </div>
       <div class="col-auto">
-        <b-button class="me-1"  v-b-modal.modal-prevent-closing variant="primary">Etc. Search</b-button>
+        <b-button class="me-1"  v-b-modal.no-search variant="primary">Etc. Search</b-button>
         <BIconFunnel v-if="noDataSelected.length === 0 " style="font-size: 1.5rem; color: #0d6efd"></BIconFunnel>
         <BIconFunnelFill v-if="noDataSelected.length !== 0 "  style="font-size: 1.5rem; color: #0d6efd"></BIconFunnelFill>
-        <b-modal
-            id="modal-prevent-closing"
-            ref="modal"
-            title="Etc. Search"
-            @show="resetModal"
-            @hidden="resetModal"
-            @ok="handleOk"
-        >
-          <b-form-group label="No Data Search Check" v-slot="{ ariaDescribedby }">
-            <b-form-checkbox-group
-                id="checkbox-group-1"
-                v-model="noDataSelected"
-                :options="noDataOptions"
-                :aria-describedby="ariaDescribedby"
-                name="flavour-1"
-                stacked
-            ></b-form-checkbox-group>
-          </b-form-group>
-        </b-modal>
       </div>
       <div class="col-auto">
         <div class="input-group mb-3">
@@ -69,34 +49,56 @@
         </div>
       </div>
     </div>
-    <b-table striped hover responsive
-             :fields="fields"
-             :items="employees"
-             show-empty
-             :busy="isBusy"
-    >
-      <template #table-busy>
-        <div class="text-center text-danger my-2">
-          <b-spinner class="align-middle"></b-spinner>
-          <strong>Loading...</strong>
-        </div>
-      </template>
-      <template #empty="scope">
-        <h4>{{ scope.emptyText }}</h4>
-      </template>
-      <template #cell(name)="data">
-        {{ data.item.firstName }} {{ data.item.lastName }}
-      </template>
-      <template #cell(salary)="data">
-        {{ data.value === -1 ? 0 : data.value }}
-      </template>
-      <template #cell(commissionPct)="data">
-        {{ data.value === -1 ? '-' : data.value * 100 }}
-      </template>
-      <template #cell(manager)="data">
-        {{ data.item.managerFirstName }} {{ data.item.managerLastName }}
-      </template>
-    </b-table>
+    <b-table-simple striped hover responsive>
+      <b-thead>
+        <b-tr>
+          <b-th v-for="(field, index) in fields" :key="index" :style="{width: field.width}">
+            {{field.label}}
+            <BIconSortDown   class="employeeList-hover" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" style="font-size: 0.8rem; color: #0d6efd"></BIconSortDown>
+            <BIconSortUpAlt     class="employeeList-hover" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"   @click="sortingEmploy(field)" style="font-size: 0.8rem; color: #0d6efd"></BIconSortUpAlt>
+            <BIconFunnel        class="employeeList-hover"   v-if="field.filter && field.filterFill !== 'full'" @click="filtering(field)" style="font-size: 0.8rem; color: #0d6efd"></BIconFunnel>
+            <BIconFunnelFill  v-b-modal.department-fill  class="employeeList-hover" v-if="field.filter && field.filterFill === 'full'" @click="filtering(field)" style="font-size: 0.8rem; color: #0d6efd"></BIconFunnelFill>
+          </b-th>
+        </b-tr>
+      </b-thead>
+      <b-tbody>
+        <b-tr v-for="(emps, idx) in employees" :key="idx">
+          <b-td>
+            {{emps['rowNum']}}
+          </b-td>
+          <b-td>
+            {{emps['employeeId']}}
+          </b-td>
+          <b-td>
+            {{emps['firstName'] +' ' + emps['lastName']}}
+          </b-td>
+          <b-td>
+            {{emps['email']}}
+          </b-td>
+          <b-td>
+            {{emps['phoneNumber']}}
+          </b-td>
+          <b-td>
+            {{emps['hireDate']}}
+          </b-td>
+          <b-td>
+            {{emps['jobId']}}
+          </b-td>
+          <b-td>
+            {{ emps['salary'] === -1 ? 0 : emps['salary'] }}
+          </b-td>
+          <b-td>
+            {{ emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100  }}
+          </b-td>
+          <b-td>
+            {{emps['managerFirstName'] + ' ' + emps['managerLastName']}}
+          </b-td>
+          <b-td>
+            {{emps['departmentName']}}
+          </b-td>
+        </b-tr>
+      </b-tbody>
+    </b-table-simple>
     <div class="row justify-content-center">
       <div class="col-auto">
         <b-form-select
@@ -142,43 +144,70 @@
         </div>
       </div>
     </div>
+    <b-modal
+        id="no-search"
+        ref="modal"
+        title="Etc. Search"
+        @ok="handleOk"
+        @cancel="handleCancel"
+    >
+      <b-form-group label="No Data Search Check" >
+        <b-form-checkbox-group
+            id="checkbox-group-1"
+            v-model="noDataSelected"
+            :options="noDataOptions"
+            name="flavour-1"
+            stacked
+        ></b-form-checkbox-group>
+      </b-form-group>
+    </b-modal>
+    <b-modal
+        id="department-fill"
+        ref="modal"
+        title="Etc. Search"
+        @ok="handleOk"
+        @cancel="handleCancel"
+    >
+      <b-form-group label="No Data Search Check" >
+        <b-form-checkbox-group
+            id="checkbox-group-1"
+            v-model="departSelect"
+            :options="departOption"
+            name="flavour-1"
+            stacked
+        ></b-form-checkbox-group>
+      </b-form-group>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import HREmployeeService from '../services/HREmployeeService'
-import LoadingSpinner from '../components/util/LoadingSpinner'
-import {BIconFunnel, BIconFunnelFill} from 'bootstrap-icons-vue'
+import {BIconFunnel, BIconFunnelFill, BIconSortDown, BIconSortUpAlt} from 'bootstrap-icons-vue'
+import _ from "lodash";
 
 export default {
   name: 'BootVueHREmployeeList',
   components: {
     BIconFunnel,
     BIconFunnelFill,
-    LoadingSpinner
+    BIconSortDown,
+    BIconSortUpAlt
   },
   data(){
     return {
-      isLoading: true,
       employees : [],
       fields: [
-        {key:'rowNum', label:'No.'},
-        {key:'employeeId', label:'ID'},
-        {key:'name', label:'Name'},
-        // {key:'firstName', label:'firstName'},
-        // {key:'lastName', label:'lastName'},
-        {key:'email', label:'Email'},
-        {key:'phoneNumber', label:'Phone'},
-        {key:'hireDate', label:'HireDate'},
-        {key:'jobId', label:'JobId'},
-        {key:'salary', label:'Salary'},
-        {key:'commissionPct', label:'Commission (%)'},
-        // {key:'managerId', label:'managerId'},
-        {key:'manager', label:'Manager'},
-        // {key:'managerFirstName', label:'managerFirstName'},
-        // {key:'managerLastName', label:'managerLastName'},
-        // {key:'departmentId', label:'departmentId'},
-        {key:'departmentName', label:'Department'},
+        {key:'rowNum',         label:'No.',           sort: 'asc', width: '90px',  filter: false},
+        {key:'employeeId',     label:'ID',            sort: 'asc', width: '70px',  filter: false},
+        {key:'name',           label:'Name',          sort: 'asc', width: '140px', filter: false},
+        {key:'email',          label:'Email',         sort: 'asc', width: '105px', filter: false},
+        {key:'phoneNumber',    label:'Phone',         sort: 'asc', width: '140px', filter: false},
+        {key:'hireDate',       label:'HireDate',      sort: 'asc', width: '120px', filter: false},
+        {key:'jobId',          label:'JobId',         sort: 'asc', width: '120px', filter: false},
+        {key:'salary',         label:'Salary',        sort: 'asc', width: '110px', filter: false},
+        {key:'commissionPct',  label:'Commission (%)',sort: 'asc', width: '200px', filter: false},
+        {key:'manager',        label:'Manager',       sort: 'asc', width: '150px', filter: false},
+        {key:'departmentName', label:'Department',    sort: 'asc', width: '150px', filter: true,  filterFill: 'full'},
       ],
       rowCountList : [
         { item: 0, name: 'Per Row' },
@@ -212,23 +241,32 @@ export default {
       empColList: [{VALUE:'Search', KEY:'search' }],
       selectEmpCol:'search',
       searchInput:'',
+      noDataSelectedConfirm: [],
       noDataSelected: [], // Must be an array reference!
       noDataOptions: [
         { text: 'No Commission', value: 'commission' },
         { text: 'No Manager', value: 'manager' },
         { text: 'No Department', value: 'department' },
       ],
+      departSelectConfirm: [],
+      departSelect: [], // Must be an array reference!
+      departOption: [
+        { text: 'IT', value: 'IT' },
+        { text: 'Public Relations', value: 'Public Relations' },
+        { text: 'Shipping', value: 'Shipping' },
+      ],
+      url :{
+        employeesBase: '/hr'
+      },
       isBusy: false,
+      sorting: '',
+      sortingKey: ''
     }
   },
   methods: {
     getHREmployees(page = 1){
         this.pageObject.page = page;
-        return HREmployeeService.getHREmployees(page, this.pageObject.perPageRow, this.pageObject.perGroupPage, this.selectEmpCol, this.searchInput, this.noDataSelected).then((response) => {
-          // if(response && response.data){
-          //   this.employees = response.data.employeeList;
-          //   this.pageObject = response.data.pageObject;
-          // }
+        return this.getHREmployeesApi(page, this.pageObject.perPageRow, this.pageObject.perGroupPage, this.selectEmpCol, this.searchInput, this.noDataSelected, this.sorting).then((response) => {
           // 화면에서 처리
           if(response && response.data && response.data.length > 0){
             this.employees = response.data;
@@ -245,7 +283,8 @@ export default {
             this.pageObject.firstPage = this.pageObject.perGroupPage < this.pageObject.page;        // 처음 페이지 존재 여부
             this.pageObject.lastPage  = this.pageObject.endPage < this.pageObject.totalPage;        // 마지막 페이지 존재 여부
           }
-          else{
+          else
+          {
             this.employees = [];
             this.pageObject.totalRow  = 0;
             this.pageObject.totalPage = 0;
@@ -260,32 +299,31 @@ export default {
         }).catch(e => {
           console.log('error : ',e);
         }).finally(() => {
-          console.log('getHREmployees');
           return true;
         })
     },
     async selectRowChange(e){
       if(e === 0) return;             // 0 이면 호출하지 않는다.
       this.pageObject.perPageRow = e; // 선택된 option값을 넣어준다.
-      this.isLoading = true;
+      this.$main.loading.show();
       await this.getHREmployees(1);    // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
-      this.isLoading = false;
+      this.$main.loading.hide();
     },
     async selectPageChange(e){
       if(e === 0) return;             // 0 이면 호출하지 않는다.
       this.pageObject.perGroupPage = e;
-      this.isLoading = true;
+      this.$main.loading.show();
       await this.getHREmployees(1);                      // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
-      this.isLoading = false;
+      this.$main.loading.hide();
     },
     async onInputPage(){
       if(this.inputPage){
         const page = Number(this.inputPage.trim());
         if(!Number.isNaN(page) && page > 0){
           const perPage = page > this.pageObject.totalPage ? this.pageObject.totalPage : page;
-          this.isLoading = true;
+          this.$main.loading.show();
           await this.getHREmployees(perPage);
-          this.isLoading = false;
+          this.$main.loading.hide();
           this.inputPage = perPage;
         }else{
           alert('유효한 값이 아닙니다.');
@@ -293,7 +331,7 @@ export default {
       }
     },
     getHREmplColList(){
-      return HREmployeeService.getHREmplColList().then((res) => {
+      return this.getHREmplColListApi().then((res) => {
         if(res && res.data){
           this.empColList = this.empColList.concat(res.data);
         }
@@ -308,9 +346,9 @@ export default {
       this.selectEmpCol = e;
       if(e === 'search'){
         this.searchInput = '';
-        this.isLoading = true;
+        this.$main.loading.show();
         await this.getHREmployees(1);                      // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
-        this.isLoading = false;
+        this.$main.loading.hide();
       }
     },
     async searchEmpCol(){
@@ -323,35 +361,76 @@ export default {
             return;
           }
         }
-        this.isLoading = true;
+        this.$main.loading.show();
         await this.getHREmployees(1);
-        this.isLoading = false;
+        this.$main.loading.hide();
       }
     },
     async pagination(){
-      this.isLoading = true;
+      this.$main.loading.show();
       await this.getHREmployees(this.pageObject.page);
-      this.isLoading = false;
-    },
-    resetModal(e) {
-      console.log('show hide state : ',e);
+      this.$main.loading.hide();
     },
     handleOk() {
-      this.handleSubmit()
+      this.noDataSelectedConfirm = this.noDataSelected;
     },
-    handleSubmit() {
-      // Push the name to submitted names
-      console.log('etcSearchSelected', this.etcSearchSelected);
+    handleCancel(){
+      this.noDataSelected = this.noDataSelectedConfirm;
     },
     async getEmploy(){
-      this.isLoading = true;
+
+      this.$main.loading.show();
       await this.getHREmplColList();
       await this.getHREmployees();
-      this.isLoading = false;
+      this.$main.loading.hide();
+    },
+    async sortingEmploy(field){
+
+      _.each(this.fields, f => {
+        if(f.key !== field.key){
+          f.sort = 'desc';
+        }else{
+          if(f.sort === 'desc'){
+            f.sort = 'asc';
+          }else if(f.sort === 'asc'){
+            f.sort = 'desc';
+          }
+        }
+      });
+
+      this.sorting = field.key + '_' + field.sort;
+      this.sortingKey = field.key;
+      this.$main.loading.show();
+      await this.getHREmployees(this.pageObject.page);    // 페이지 마다 보여주는 row수가 바뀌었으므로 1페이지 부터 시작한다.
+      this.$main.loading.hide();
+    },
+    filtering(field){
+      console.log('field :', field);
+    },
+    getHREmployeesApi(page, perPageRow, perGroupPage, searchKey, searchValue, noDataList, sorting){
+
+      if(searchKey && searchValue){
+        if(searchKey === 'commissionPct'){
+          searchValue = searchValue * 0.01;
+        }
+      }
+      const noDataParams = noDataList.map((item) => `${item}No=1`).join('&');
+
+      return this.$http.get(`${this.url.employeesBase}/employees?page=${page}&perPageRow=${perPageRow}&perGroupPage=${perGroupPage}&key=${searchKey}&value=${searchValue}&${noDataParams}&sorting=${sorting}`);
+    },
+    getHREmplColListApi(){
+      return this.$http.get(this.url.employeesBase + '/empColList');
     }
   },
   created() {
     this.getEmploy();
+    console.log('BootVueHREmployeeList created :', this.$main.loading);
+  },
+  mounted() {
+    console.log('BootVueHREmployeeList mounted :', this.$refs.modal);
+  },
+  updated() {
+    console.log('BootVueHREmployeeList updated :', this.$refs.modal);
   }
 }
 </script>
@@ -359,4 +438,14 @@ export default {
   .employeeList-container{
     position: relative;
   }
+
+  .employeeList-hover:hover{
+    cursor: pointer;
+  }
+
+  .sortActive{
+    color: red !important;
+    font-weight: bolder !important;
+  }
+
 </style>

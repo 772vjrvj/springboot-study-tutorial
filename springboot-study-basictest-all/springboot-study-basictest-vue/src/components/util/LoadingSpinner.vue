@@ -10,11 +10,18 @@
 
 export default {
   name: 'BootVueHREmployeeList',
-  props:{
-    isLoading: {
-      type: Boolean,
-      required: true
+  data() {
+    return {
+      isLoading: false,
+    }
+  },
+  methods: {
+    show(){
+      this.isLoading = true;
     },
+    hide(){
+      this.isLoading = false;
+    }
   },
 }
 </script>
@@ -25,6 +32,7 @@ export default {
   height: 100vh;
   z-index: 999;
   width: 100%;
+  opacity: 0.5;
   overflow: hidden;
 }
 </style>

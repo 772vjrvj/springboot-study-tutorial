@@ -9,5 +9,16 @@
 
 export default {
   name: 'HomeView',
+  created() {
+    console.log('HomeView created ; ');
+  },
+  mounted() {
+    console.log('HomeView mounted ; ');
+  },
+  updated() {
+    console.log('HomeView updated ; ');
+  },
 }
+
+
 </script>

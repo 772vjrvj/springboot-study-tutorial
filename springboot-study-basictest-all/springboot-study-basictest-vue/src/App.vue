@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+      <LoadingSpinner ref="loading"/>
       <header class="d-flex flex-wrap align-items-center justify-content-center py-3 mb-4 border-bottom">
         <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
           <li class="nav-item">
@@ -21,24 +22,27 @@
         </div>
       </header>
       <router-view />
-      <GantTable />
   </div>
 </template>
 
 <script>
-// import BootVueHREmployeeList from './components/BootVueHREmployeeList.vue'
-// import GantTest from './components/GantTest.vue'
-// import GantTableCross from './components/GantTableCross.vue'
-// import GantTable from './views/GantTableCross.vue'
+import LoadingSpinner from "@/components/util/LoadingSpinner";
 
 
 export default {
   name: 'App',
   components: {
-    // BootVueHREmployeeList,
-    // GantTest,
-    // GantTableCross,
-    // GantTable
+    LoadingSpinner
+  },
+  created() {
+    console.log('App created');
+  },
+  mounted() {
+    console.log('App mounted');
+    this.$main.loading = this.$refs.loading;
+  },
+  updated() {
+    console.log('App updated');
   }
 }
 </script>

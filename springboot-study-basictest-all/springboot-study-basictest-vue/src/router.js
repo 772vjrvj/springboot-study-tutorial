@@ -4,10 +4,6 @@ import Home from "./views/HomeView.vue";
 import BootVueHREmployeeList from "./views/BootVueHREmployeeList";
 import GantTableCross from "./views/GantTableCross";
 
-
-
-
-
 const routes = [
     {
         path: "/",
