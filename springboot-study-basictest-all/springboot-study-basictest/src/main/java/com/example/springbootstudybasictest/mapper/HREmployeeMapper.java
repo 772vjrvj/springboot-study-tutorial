@@ -5,6 +5,7 @@ import com.example.springbootstudybasictest.vo.HREmployeeVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,4 +19,7 @@ public interface HREmployeeMapper {
     List<HREmployeeVO> HREmployeeMultiSearchList(HashMap paramObj);
 
     List<HashMap<String, String>> HREmployeeColumnList();
+    List<HashMap<String, String>> HREmployeeDepartmentList();
+    int HREmployeeDelete(List<String> ids);
+
 }

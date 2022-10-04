@@ -1,63 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.springbootstudybasictest.mapper.HREmployeeMapper">
-    <!-- 다중 검색 조회 조건 현재 사용 X-->
-    <sql id="multiSearch">
-        <bind name="employeeId" value="'%'+hrEmployeeVO.employeeId+'%'"/>
-        <bind name="firstName" value="'%'+hrEmployeeVO.firstName+'%'"/>
-        <bind name="lastName" value="'%'+hrEmployeeVO.lastName+'%'"/>
-        <bind name="email" value="'%'+hrEmployeeVO.email+'%'"/>
-        <bind name="phoneNumber" value="'%'+hrEmployeeVO.phoneNumber+'%'"/>
-        <bind name="hireDate" value="'%'+hrEmployeeVO.hireDate+'%'"/>
-        <bind name="jobId" value="'%'+hrEmployeeVO.jobId+'%'"/>
-        <bind name="managerId" value="'%'+hrEmployeeVO.managerId+'%'"/>
-        <bind name="departmentId" value="'%'+hrEmployeeVO.departmentId+'%'"/>
-        <bind name="departmentName" value="'%'+hrEmployeeVO.departmentName+'%'"/>
-        <bind name="managerFirstName" value="'%'+hrEmployeeVO.managerFirstName+'%'"/>
-        <bind name="managerLastName" value="'%'+hrEmployeeVO.managerLastName+'%'"/>
-        <if test="employeeId !=null and employeeId != ''">
-            AND E.EMPLOYEE_ID LIKE #{employeeId}
-        </if>
-        <if test="firstName !=null and firstName != ''">
-            AND E.FIRST_NAME LIKE #{firstName}
-        </if>
-        <if test="lastName !=null and lastName != ''">
-            AND E.LAST_NAME LIKE #{lastName}
-        </if>
-        <if test="email !=null and email != ''">
-            AND E.EMAIL LIKE #{email}
-        </if>
-        <if test="phoneNumber !=null and phoneNumber != ''">
-            AND E.PHONE_NUMBER LIKE #{phoneNumber}
-        </if>
-        <if test="hireDate !=null and hireDate != ''">
-            AND E.HIRE_DATE LIKE #{hireDate}
-        </if>
-        <if test="jobId !=null and jobId != ''">
-            AND E.JOB_ID LIKE #{jobId}
-        </if>
-        <if test="hrEmployeeVO.salary != null and hrEmployeeVO.salary != -1">
-            AND E.SALARY = #{hrEmployeeVO.salary}
-        </if>
-        <if test="hrEmployeeVO.commissionPct !=null and hrEmployeeVO.commissionPct != -1.0">
-            AND E.COMMISSION_PCT = #{hrEmployeeVO.commissionPct}
-        </if>
-        <if test="managerId != null and managerId != ''">
-            AND E.MANAGER_ID LIKE #{managerId}
-        </if>
-        <if test="departmentId != null and departmentId != ''">
-            AND E.DEPARTMENT_ID LIKE #{departmentId}
-        </if>
-        <if test="departmentName != null and departmentName != ''">
-            AND D.DEPARTMENT_NAME LIKE #{departmentName}
-        </if>
-        <if test="managerFirstName != null and managerFirstName != ''">
-            AND M.FIRST_NAME LIKE #{managerFirstName}
-        </if>
-        <if test="managerLastName != null and managerLastName != ''">
-            AND M.LAST_NAME LIKE #{managerLastName}
-        </if>
-    </sql>
 
     <!-- 싱글 검색 조회 조건 -->
     <sql id="singleSearch">
@@ -108,6 +51,7 @@
         </if>
     </sql>
 
+    <!-- 정렬 조건 -->
     <sql id="sorting">
         <if test="sorting !=null and sorting != ''">
             <!-- 2글자 이상인 경우 : String 취급, 한 글자인 경우:char 취급 => toString()를 이용해서 문자열(string)로 -->
@@ -203,6 +147,23 @@
         </if>
     </sql>
 
+    <!-- department 값 조회-->
+    <sql id="selectDepCol">
+        <if test="selectDepCol != null and selectDepCol.size != 0">
+            AND E.DEPARTMENT_ID IN
+            <foreach collection="selectDepCol" item="dep" open="(" close=")" separator=",">
+                #{dep}
+            </foreach>
+        </if>
+    </sql>
+
+    <!-- Not Null 조건 체크-->
+    <sql id="notNullSearch">
+        AND E.COMMISSION_PCT IS NOT NULL
+        AND E.MANAGER_ID IS NOT NULL
+        AND E.DEPARTMENT_ID IS NOT NULL
+    </sql>
+
     <!-- HREmployeeList-->
     <sql id="HREmployeeSelect">
         SELECT
@@ -224,6 +185,7 @@
         WHERE 1=1
           AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
           AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
+          AND E.DELETED_YN = 'N'
     </sql>
 
     <!-- 싱글 검색 -->
@@ -231,8 +193,13 @@
         SELECT ROW_NUMBER() OVER(ORDER BY E.FIRST_NAME ASC, E.LAST_NAME ASC) ROW_NUM, E.*
         FROM (
             <include refid="HREmployeeSelect" />
+            <include refid="notNullSearch" />
             <include refid="singleSearch" />
+            <include refid="selectDepCol" />
+
             <include refid="noSearch" />
+            <include refid="singleSearch" />
+            <include refid="selectDepCol" />
         ) E
         <include refid="sorting" />
         <include refid="common.sql.pageOffset"/>
@@ -244,25 +211,123 @@
         FROM
         (
             <include refid="HREmployeeSelect" />
+            <include refid="notNullSearch" />
             <include refid="singleSearch" />
+            <include refid="selectDepCol" />
+
             <include refid="noSearch" />
+            <include refid="singleSearch" />
+            <include refid="selectDepCol" />
+        )
+    </select>
+
+    <!-- 직원 삭제 -->
+    <update id="HREmployeeDelete">
+        UPDATE EMPLOYEES
+        SET
+        DELETED_YN = 'Y'
+        WHERE
+        EMPLOYEE_ID IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- Department list -->
+    <select id="HREmployeeDepartmentList" resultType="map">
+        SELECT TEXT AS "text", VALUE AS "value"
+        FROM
+        (
+            SELECT
+            DISTINCT
+            TO_CHAR(E.DEPARTMENT_ID) as value,
+            D.DEPARTMENT_NAME as text
+            FROM EMPLOYEES E, EMPLOYEES M, DEPARTMENTS D
+            WHERE 1=1
+            AND E.MANAGER_ID = M.EMPLOYEE_ID(+)
+            AND E.DEPARTMENT_ID = D.DEPARTMENT_ID(+)
+            <include refid="singleSearch"/>
+            <include refid="noSearch"/>
+            ORDER BY value ASC
         )
     </select>
 
     <!-- 전체 컬럼 list -->
     <select id="HREmployeeColumnList" resultType="map">
-        SELECT
-            SUBSTR(REPLACE(INITCAP('1' || COLUMN_NAME), '_'), 2) as key,
-            REPLACE(COLUMN_NAME,'_',' ') as value
-        FROM ALL_TAB_COLUMNS
-        WHERE TABLE_NAME = 'EMPLOYEES'
-        UNION
-        SELECT 'managerFirstName' as key, 'MANAGER FIRST NAME' as value FROM DUAL
-        UNION
-        SELECT 'managerLastName' as key, 'MANAGER LAST NAME' as value FROM DUAL
-        UNION
-        SELECT 'departmentName' as key, 'DEPARTMENT NAME' as value  FROM DUAL
+        SELECT * FROM
+        (
+            SELECT
+                SUBSTR(REPLACE(INITCAP('1' || COLUMN_NAME), '_'), 2) as key,
+                REPLACE(COLUMN_NAME,'_',' ') as value
+            FROM ALL_TAB_COLUMNS
+            WHERE TABLE_NAME = 'EMPLOYEES'
+            UNION
+            SELECT 'managerFirstName' as key, 'MANAGER FIRST NAME' as value FROM DUAL
+            UNION
+            SELECT 'managerLastName' as key, 'MANAGER LAST NAME' as value FROM DUAL
+            UNION
+            SELECT 'departmentName' as key, 'DEPARTMENT NAME' as value  FROM DUAL
+        )
+        WHERE KEY NOT IN ('part')
     </select>
+
+    <!-- 다중 검색 조회 조건 현재 사용 X-->
+    <sql id="multiSearch">
+        <bind name="employeeId" value="'%'+hrEmployeeVO.employeeId+'%'"/>
+        <bind name="firstName" value="'%'+hrEmployeeVO.firstName+'%'"/>
+        <bind name="lastName" value="'%'+hrEmployeeVO.lastName+'%'"/>
+        <bind name="email" value="'%'+hrEmployeeVO.email+'%'"/>
+        <bind name="phoneNumber" value="'%'+hrEmployeeVO.phoneNumber+'%'"/>
+        <bind name="hireDate" value="'%'+hrEmployeeVO.hireDate+'%'"/>
+        <bind name="jobId" value="'%'+hrEmployeeVO.jobId+'%'"/>
+        <bind name="managerId" value="'%'+hrEmployeeVO.managerId+'%'"/>
+        <bind name="departmentId" value="'%'+hrEmployeeVO.departmentId+'%'"/>
+        <bind name="departmentName" value="'%'+hrEmployeeVO.departmentName+'%'"/>
+        <bind name="managerFirstName" value="'%'+hrEmployeeVO.managerFirstName+'%'"/>
+        <bind name="managerLastName" value="'%'+hrEmployeeVO.managerLastName+'%'"/>
+        <if test="employeeId !=null and employeeId != ''">
+            AND E.EMPLOYEE_ID LIKE #{employeeId}
+        </if>
+        <if test="firstName !=null and firstName != ''">
+            AND E.FIRST_NAME LIKE #{firstName}
+        </if>
+        <if test="lastName !=null and lastName != ''">
+            AND E.LAST_NAME LIKE #{lastName}
+        </if>
+        <if test="email !=null and email != ''">
+            AND E.EMAIL LIKE #{email}
+        </if>
+        <if test="phoneNumber !=null and phoneNumber != ''">
+            AND E.PHONE_NUMBER LIKE #{phoneNumber}
+        </if>
+        <if test="hireDate !=null and hireDate != ''">
+            AND E.HIRE_DATE LIKE #{hireDate}
+        </if>
+        <if test="jobId !=null and jobId != ''">
+            AND E.JOB_ID LIKE #{jobId}
+        </if>
+        <if test="hrEmployeeVO.salary != null and hrEmployeeVO.salary != -1">
+            AND E.SALARY = #{hrEmployeeVO.salary}
+        </if>
+        <if test="hrEmployeeVO.commissionPct !=null and hrEmployeeVO.commissionPct != -1.0">
+            AND E.COMMISSION_PCT = #{hrEmployeeVO.commissionPct}
+        </if>
+        <if test="managerId != null and managerId != ''">
+            AND E.MANAGER_ID LIKE #{managerId}
+        </if>
+        <if test="departmentId != null and departmentId != ''">
+            AND E.DEPARTMENT_ID LIKE #{departmentId}
+        </if>
+        <if test="departmentName != null and departmentName != ''">
+            AND D.DEPARTMENT_NAME LIKE #{departmentName}
+        </if>
+        <if test="managerFirstName != null and managerFirstName != ''">
+            AND M.FIRST_NAME LIKE #{managerFirstName}
+        </if>
+        <if test="managerLastName != null and managerLastName != ''">
+            AND M.LAST_NAME LIKE #{managerLastName}
+        </if>
+    </sql>
 
     <!-- 다중 검색 list 현재 사용 X-->
     <select id="HREmployeeMultiSearchList" parameterType="HashMap" resultType="HREmployeeVO">

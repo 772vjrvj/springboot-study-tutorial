@@ -131,7 +131,7 @@
 </template>
 
 <script>
-import HREmployeeService from '../services/HREmployeeService'
+import HREmployeeService from '../../services/HREmployeeService'
 
 export default {
   name: 'HREmployeeList',

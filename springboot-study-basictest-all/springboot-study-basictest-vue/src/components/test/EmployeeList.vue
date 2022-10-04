@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import EmployeeService from '../services/EmployeeService'
+import EmployeeService from '../../services/EmployeeService'
 
 export default {
     name: 'EmployeeList',

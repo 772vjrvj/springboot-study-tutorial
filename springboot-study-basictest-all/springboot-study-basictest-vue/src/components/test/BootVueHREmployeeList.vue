@@ -149,7 +149,7 @@
 </template>
 
 <script>
-import HREmployeeService from '../services/HREmployeeService'
+import HREmployeeService from '../../services/HREmployeeService'
 import {BIconFunnel, BIconFunnelFill} from 'bootstrap-icons-vue'
 
 export default {

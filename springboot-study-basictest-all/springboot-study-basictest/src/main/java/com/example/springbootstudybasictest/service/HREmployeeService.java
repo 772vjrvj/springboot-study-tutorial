@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class HREmployeeService {
 //    }
 
     // 페이징 프론트 처리용
-    public List<HREmployeeVO> HREmployeeList(PageObject pageObject, String key, String value, String commissionNo, String managerNo, String departmentNo, String sorting) {
+    public List<HREmployeeVO> HREmployeeList(PageObject pageObject, String key, String value, String commissionNo, String managerNo, String departmentNo, String sorting, List<String> selectDepCol) {
         HashMap<String, Object> paramObj = new HashMap<>();
         paramObj.put("pageObject", pageObject);
         paramObj.put("key", key);
@@ -36,6 +37,7 @@ public class HREmployeeService {
         paramObj.put("managerNo", managerNo);
         paramObj.put("departmentNo", departmentNo);
         paramObj.put("sorting", sorting);
+        paramObj.put("selectDepCol", selectDepCol);
         int totalCount = mapper.HREmployeeTotCnt(paramObj);
         List<HREmployeeVO> employeeList = mapper.HREmployeeList(paramObj);
         if(!CollectionUtils.isEmpty(employeeList)){
@@ -60,6 +62,15 @@ public class HREmployeeService {
     public List<HashMap<String, String>> HREmployeeColumnList() {
         List<HashMap<String, String>> HREmpColList = mapper.HREmployeeColumnList();
         return HREmpColList;
+    }
+
+    public List<HashMap<String, String>> HREmployeeDepartmentList() {
+        List<HashMap<String, String>> HREmpDepList = mapper.HREmployeeDepartmentList();
+        return HREmpDepList;
+    }
+
+    public int HREmployeeDelete(List<String> ids) {
+        return mapper.HREmployeeDelete(ids);
     }
 }
 

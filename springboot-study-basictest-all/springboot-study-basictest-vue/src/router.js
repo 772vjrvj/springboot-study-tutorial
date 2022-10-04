@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 
 import Home from "./views/HomeView.vue";
-import BootVueHREmployeeList from "./views/BootVueHREmployeeList";
+import EmployeeListTab from "./views/EmployeeListTab";
 import GantTableCross from "./views/GantTableCross";
 
 const routes = [
@@ -12,8 +12,8 @@ const routes = [
     },
     {
         path: "/employeeList",
-        name: "BootVueHREmployeeList",
-        component: BootVueHREmployeeList,
+        name: "EmployeeList",
+        component: EmployeeListTab,
     },
     {
         path: "/teamList",
