@@ -5,7 +5,7 @@
         <EmployeeSingleList />
       </b-tab>
       <b-tab title="Multi">
-        <EmployeeSingleList />
+        <EmployeeMultiList />
       </b-tab>
     </b-tabs>
   </div>
@@ -13,10 +13,12 @@
 
 <script>
 import employeeSingleList from '@/views/employeeList/EmployeeSingleList'
+import employeeMultiList from '@/views/employeeList/EmployeeMultiList'
 
 export default {
   components:{
-    EmployeeSingleList :employeeSingleList
+    EmployeeSingleList :employeeSingleList,
+    EmployeeMultiList :employeeMultiList,
   }
 }
 
