@@ -1,9 +1,68 @@
 <template>
   <div class = "container employeeList-container" @mousemove="empGripMouseMove" @mouseup="empGripMouseUp">
         <div class="emp-line"></div>
-        <div class="text-start fs-4 mb-4 position-relative"> Employees Single List.</div>
+        <div class="text-start fs-4 mb-4 position-relative"> Employees Multi List.</div>
+        <form class="row g-3 mb-4">
+          <div class="col-sm-2">
+            <label for="empId" class="form-label">{{searchForm.empId.text}}</label>
+            <input type="text" v-model="searchForm.empId.value" class="form-control" id="empId">
+          </div>
+          <div class="col-sm-2">
+            <label for="empFirst" class="form-label">{{searchForm.empFirst.text}}</label>
+            <input type="text" v-model="searchForm.empFirst.value" class="form-control" id="empFirst">
+          </div>
+          <div class="col-sm-2">
+            <label for="empLast" class="form-label">{{searchForm.empLast.text}}</label>
+            <input type="text" v-model="searchForm.empLast.value" class="form-control" id="empLast">
+          </div>
+          <div class="col-sm-2">
+            <label for="email" class="form-label">{{searchForm.email.text}}</label>
+            <input type="email" v-model="searchForm.email.value" class="form-control" id="email">
+          </div>
+          <div class="col-sm-2">
+            <label for="phone" class="form-label">{{searchForm.phone.text}}</label>
+            <input type="text" v-model="searchForm.phone.value" class="form-control" id="phone">
+          </div>
+          <div class="col-sm-2">
+            <label for="hireDate" class="form-label">{{searchForm.hireDate.text}}</label>
+            <input type="date" v-model="searchForm.hireDate.value" class="form-control" id="hireDate">
+          </div>
+          <div class="col-sm-1">
+            <label for="jobId" class="form-label">{{searchForm.jobId.text}}</label>
+            <input type="text" v-model="searchForm.jobId.value" class="form-control" id="jobId">
+          </div>
+          <div class="col-sm-1">
+            <label for="salary" class="form-label">{{searchForm.salary.text}}</label>
+            <input type="text" v-model="searchForm.salary.value" class="form-control" id="salary">
+          </div>
+          <div class="col-sm-2">
+            <label for="commission" class="form-label">{{searchForm.commission.text}}</label>
+            <input type="text" v-model="searchForm.commission.value" class="form-control" id="commission">
+          </div>
+          <div class="col-sm-2">
+            <label for="managerFirst" class="form-label">{{searchForm.managerFirst.text}}</label>
+            <input type="email" v-model="searchForm.managerFirst.value" class="form-control" id="managerFirst">
+          </div>
+          <div class="col-sm-2">
+            <label for="managerLast" class="form-label">{{searchForm.managerLast.text}}</label>
+            <input type="text" v-model="searchForm.managerLast.value" class="form-control" id="managerLast">
+          </div>
+          <div class="col-sm-2">
+            <label for="department" class="form-label">{{searchForm.department.text}}</label>
+            <input type="text" v-model="searchForm.department.value" class="form-control" id="department">
+          </div>
 
-        <div class="row justify-content-between">
+          <div class="col-sm-1">
+            <label class="form-label">&nbsp;</label>
+            <b-button @click="reset" class="w-100" variant="outline-secondary">Reset</b-button>
+          </div>
+          <div class="col-sm-1">
+            <label class="form-label">&nbsp;</label>
+            <b-button @click="multiSearch" class="w-100" variant="secondary">Search</b-button>
+          </div>
+        </form>
+
+        <div class="row justify-content-start">
           <div class="col-auto">
             <b-form-select
                 @change="selectRowChange"
@@ -18,36 +77,11 @@
           </div>
           <div class="col-auto"><span class="lh-lg">Total Row : {{this.pageObject.totalRow}}</span></div>
           <div class="col-auto">
-            <b-button class="me-1" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-delete>Delete</b-button>
+            <b-button class="me-1 ms-4" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-delete>Delete</b-button>
             <b-button class="me-1" squared variant="secondary">Create</b-button>
             <b-button class="ms-4" v-b-modal.no-search variant="secondary">Etc. Search</b-button>
             <BIconFunnel class="employeeList-hover" v-b-modal.no-search v-if="noDataSelected.length === 0 " style="font-size: 1.5rem; color: #6c757d"></BIconFunnel>
             <BIconFunnelFill class="employeeList-hover" v-b-modal.no-search v-if="noDataSelected.length !== 0 "  style="font-size: 1.5rem; color: #6c757d"></BIconFunnelFill>
-          </div>
-          <div class="col-auto">
-            <div class="input-group mb-3">
-              <b-form-select
-                  @change="searchChange"
-                  id="inline-form-custom-select-pref"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                  :options="empColList"
-                  v-model="selectEmpCol"
-                  value-field="KEY"
-                  text-field="VALUE"
-              >
-              </b-form-select>
-              <b-form-input
-                  v-model="searchInput"
-                  type="text"
-                  placeholder="Input your contents"
-                  :disabled="selectEmpCol === 'search'"
-                  @keyup.enter="searchEmpCol"
-              ></b-form-input>
-              <b-button
-                  @click="searchEmpCol"
-                  variant="secondary"
-              >Go</b-button>
-            </div>
           </div>
         </div>
         <b-table-simple
@@ -262,6 +296,56 @@ export default {
     return {
       employees : [],
       selectedEmployees : [],
+      searchForm: {
+        empId: {
+          text: 'Employee ID',
+          value: ''
+        },
+        empFirst: {
+          text: 'Employee First Name',
+          value: ''
+        },
+        empLast: {
+          text: 'Employee First Name',
+          value: ''
+        },
+        email: {
+          text: 'Email',
+          value: ''
+        },
+        phone: {
+          text: 'Phone',
+          value: ''
+        },
+        hireDate: {
+          text: 'HireDate',
+          value: ''
+        },
+        jobId: {
+          text: 'Job ID',
+          value: ''
+        },
+        salary: {
+          text: 'Salary $',
+          value: ''
+        },
+        commission: {
+          text: 'Commission (%)',
+          value: ''
+        },
+        managerFirst: {
+          text: 'Manager First Name',
+          value: ''
+        },
+        managerLast: {
+          text: 'Manager Last Name',
+          value: ''
+        },
+        department: {
+          text: 'Department',
+          value: ''
+        },
+      },
       fields: [
         {key:'chkAll',         label:'chkAll',          width: '10px',   filter: false, defaultWidth: '10px',  chk: false}, //2%
         {key:'rowNum',         label:'No.',             width: '45px',   filter: false, defaultWidth: '45px',  sort: 'asc'}, //2%
@@ -325,7 +409,7 @@ export default {
       url :{
         employeesColList: '/hr/empColList',
         employeesDepList: '/hr/empDepList',
-        employeesList: '/hr/employees',
+        employeesList: '/hr/multiSearch/employees',
         employeesDelete: '/hr/empDelete',
       },
       isBusy: false,
@@ -570,15 +654,26 @@ export default {
         page: page,
         perPageRow: this.pageObject.perPageRow,
         perGroupPage: this.pageObject.perGroupPage,
-        key: key,
-        value: value,
         sorting: this.sorting,
-        selectDepCol: this.selectDepCol
+        selectDepCol: this.selectDepCol,
+        employeeId: this.searchForm.empId.value,
+        firstName: this.searchForm.empFirst.value,
+        lastName: this.searchForm.empLast.value,
+        email: this.searchForm.email.value,
+        phoneNumber: this.searchForm.phone.value,
+        hireDate: this.searchForm.hireDate.value.replaceAll('-','.'),
+        jobId: this.searchForm.jobId.value,
+        salary: this.searchForm.salary.value ? this.searchForm.salary.value : -1,
+        commissionPct: this.searchForm.commission.value ? this.searchForm.commission.value * 0.01 : -1,
+        departmentName: this.searchForm.department.value,
+        managerFirstName: this.searchForm.managerFirst.value,
+        managerLastName: this.searchForm.managerLast.value,
       };
 
       _.each(this.noDataSelected, item => {
         params[item] = '1';
       });
+      console.log('qs.stringify(params, { arrayFormat: \'brackets\' }) ; ', qs.stringify(params, { arrayFormat: 'brackets' }));
 
       return this.$http.get(this.url.employeesList + '?' + qs.stringify(params, { arrayFormat: 'brackets' }))
     },
@@ -665,6 +760,36 @@ export default {
         this.getHREmployees(1);
       }
     },
+
+    reset(){
+      this.searchForm.empId.value = '';
+      this.searchForm.empFirst.value = '';
+      this.searchForm.empLast.value = '';
+      this.searchForm.email.value = '';
+      this.searchForm.phone.value = '';
+      this.searchForm.hireDate.value = '';
+      this.searchForm.jobId.value = '';
+      this.searchForm.salary.value= '';
+      this.searchForm.commission.value = '';
+      this.searchForm.managerFirst.value = '';
+      this.searchForm.managerLast.value = '';
+      this.searchForm.department.value = '' ;
+    },
+
+    multiSearch(){
+      this.getHREmployees(1);
+      console.log('this.searchForm ; ', this.searchForm);
+    },
+
+    hireDateOK(){
+
+    },
+
+    hireDateCancel(){
+
+    },
+
+
   },
 
   watch: {
@@ -692,6 +817,9 @@ export default {
         this.allSelectDepCol = false;
       }
     },
+    getValidationState({ dirty, validated, valid = null }) {
+      return dirty || validated ? valid : null;
+    },
 
   },
 
@@ -700,8 +828,7 @@ export default {
   },
 
   updated() {
-    console.log('ddd');
-  }
+  },
 
 }
 </script>

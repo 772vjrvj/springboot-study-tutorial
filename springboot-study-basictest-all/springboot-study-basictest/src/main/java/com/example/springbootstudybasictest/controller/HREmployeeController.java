@@ -30,7 +30,7 @@ public class HREmployeeController {
 
     //다중 검색
     @GetMapping("/multiSearch/employees")
-    public List<HREmployeeVO> getHRMultiSearchEmployeeList(PageObject pageObject, HREmployeeVO hrEmployeeVO)
+    public List<HREmployeeVO> getHRMultiSearchEmployeeList(PageObject pageObject, HREmployeeVO hrEmployeeVO, String commissionNo, String managerNo, String departmentNo, String sorting, @RequestParam(value ="selectDepCol[]", required=false) List<String> selectDepCol)
     {
         List<HREmployeeVO> employeeList = hrEmployeeService.HREmployeeMultiSearchList(pageObject, hrEmployeeVO);
         return employeeList;
