@@ -1,9 +1,24 @@
 <template>
   <div class = "container employeeList-container" @mousemove="empGripMouseMove" @mouseup="empGripMouseUp">
-        <div class="emp-line"></div>
-        <div class="text-start fs-4 mb-4 position-relative"> Employees Single List.</div>
+        <div class="text-start h4 font-weight-normal mb-5 position-relative"> Employees Multi List.</div>
+        <validation-observer ref="observer" v-slot="{ handleSubmit }">
+          <b-form class="pt-2 pb-2 mb-2 row g-3 multi-search-form" @submit.stop.prevent="handleSubmit(onSubmit)">
 
-        <div class="row justify-content-between">
+            <div v-for="(v,i) in searchForm" class="col-sm-2" :key="i">
+              <formValidInput
+                  @formInputChange="formInputChange"
+                  :text="v.text"
+                  :parentKey="v.key"
+                  :rules="{ required: true, min: 3 }"
+              />
+            </div>
+            <div class="col-sm-2">
+              <b-button type="submit" variant="primary">Submit</b-button>
+              <b-button class="ml-2" @click="resetForm()">Reset</b-button>
+            </div>
+          </b-form>
+        </validation-observer>
+        <div class="row justify-content-start">
           <div class="col-auto">
             <b-form-select
                 @change="selectRowChange"
@@ -16,38 +31,13 @@
             >
             </b-form-select>
           </div>
-          <div class="col-auto"><span class="lh-lg">Total Row : {{this.pageObject.totalRow}}</span></div>
+          <div class="col-auto"><span>Total Row : {{this.pageObject.totalRow}}</span></div>
           <div class="col-auto">
-            <b-button class="me-1" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-delete>Delete</b-button>
-            <b-button class="me-1" squared variant="secondary">Create</b-button>
-            <b-button class="ms-4" v-b-modal.no-search variant="secondary">Etc. Search</b-button>
-            <BIconFunnel class="employeeList-hover" v-b-modal.no-search v-if="noDataSelected.length === 0 " style="font-size: 1.5rem; color: #6c757d"></BIconFunnel>
-            <BIconFunnelFill class="employeeList-hover" v-b-modal.no-search v-if="noDataSelected.length !== 0 "  style="font-size: 1.5rem; color: #6c757d"></BIconFunnelFill>
-          </div>
-          <div class="col-auto">
-            <div class="input-group mb-3">
-              <b-form-select
-                  @change="searchChange"
-                  id="inline-form-custom-select-pref"
-                  class="mb-2 mr-sm-2 mb-sm-0"
-                  :options="empColList"
-                  v-model="selectEmpCol"
-                  value-field="KEY"
-                  text-field="VALUE"
-              >
-              </b-form-select>
-              <b-form-input
-                  v-model="searchInput"
-                  type="text"
-                  placeholder="Input your contents"
-                  :disabled="selectEmpCol === 'search'"
-                  @keyup.enter="searchEmpCol"
-              ></b-form-input>
-              <b-button
-                  @click="searchEmpCol"
-                  variant="secondary"
-              >Go</b-button>
-            </div>
+            <b-button class="mr-1" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-delete>Delete</b-button>
+            <b-button class="mr-1" squared variant="secondary">Create</b-button>
+            <b-button class="ml-4 mr-2" v-b-modal.no-multi-search variant="secondary">Etc. Search</b-button>
+            <font-awesome-icon class="fa-filter-empty fa-default" v-if="noDataSelected.length === 0" v-b-modal.no-multi-search icon="fa-solid fa-filter" />
+            <font-awesome-icon class="fa-filter-fill fa-default" v-if="noDataSelected.length !== 0" v-b-modal.no-multi-search icon="fa-solid fa-filter" />
           </div>
         </div>
         <b-table-simple
@@ -61,14 +51,14 @@
               <b-th v-for="(field, index) in fields" :key="index" class="emp-th" :style="{width: field.width}">
                 <template v-if="field.key !== 'chkAll'">
                   {{field.label}}
-                  <BIconSortDown   class="employeeList-hover" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" style="font-size: 0.8rem; color: #0d6efd" />
-                  <BIconSortUpAlt  class="employeeList-hover" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" style="font-size: 0.8rem; color: #0d6efd" />
-                  <BIconFunnel     class="employeeList-hover" v-if="field.filter && !field.filterFill" style="font-size: 0.8rem; color: #6c757d" v-b-modal.department-fill />
-                  <BIconFunnelFill class="employeeList-hover" v-if="field.filter && field.filterFill"  style="font-size: 0.8rem; color: #6c757d" v-b-modal.department-fill />
+                  <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" icon="fa-solid fa-arrow-down-short-wide" />
+                  <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" icon="fa-solid fa-arrow-up-wide-short" />
+                  <font-awesome-icon class="fa-filter-empty fa-default" v-if="field.filter && !field.filterFill"  v-b-modal.department-multi-fill icon="fa-solid fa-filter"/>
+                  <font-awesome-icon class="fa-filter-fill fa-default" v-if="field.filter && field.filterFill"   v-b-modal.department-multi-fill icon="fa-solid fa-filter"/>
                   <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
                 </template>
                 <template v-else>
-                  <b-form-checkbox @click="chkAll" :checked="field.chk" />
+                  <b-form-checkbox @change="chkAll" :checked="field.chk" />
                   <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
                 </template>
               </b-th>
@@ -78,7 +68,7 @@
             <b-tr v-for="(emps, idx) in employees" :key="idx">
               <b-td>
                 <div :style="{width: fields[0].width}">
-                  <b-form-checkbox :checked="emps['chk']" @click="chkOne($event, idx)" />
+                  <b-form-checkbox :checked="emps['chk']" @change="chkOne($event, idx)" />
                 </div>
               </b-td>
               <b-td>
@@ -164,7 +154,7 @@
                 last-text="Last"
                 :limit="pageObject.perGroupPage"
                 align="center"
-                @click="pagination"
+                @page-click="pagination"
             ></b-pagination>
           </div>
           <div class="col-auto">
@@ -184,7 +174,7 @@
           </div>
         </div>
         <b-modal
-            id="no-search"
+            id="no-multi-search"
             ref="modal"
             title="Etc. Search"
             @ok="handleNoDataOk"
@@ -208,7 +198,7 @@
           </b-form-group>
         </b-modal>
         <b-modal
-            id="department-fill"
+            id="department-multi-fill"
             ref="modal"
             title="Department List"
             okTitle="Filter"
@@ -244,34 +234,101 @@
 </template>
 
 <script>
-import {BIconFunnel, BIconFunnelFill, BIconSortDown, BIconSortUpAlt} from 'bootstrap-icons-vue'
 import _ from "lodash";
 import qs from "qs";
+import FormValidInput from "@/components/form/FormValidInput"
 
 export default {
   name: 'employeeSingleList',
 
   components: {
-    BIconFunnel,
-    BIconFunnelFill,
-    BIconSortDown,
-    BIconSortUpAlt
+    formValidInput:FormValidInput
   },
 
   data(){
     return {
+      foods: [
+        { value: null, text: "Choose..." },
+        { value: "apple", text: "Apple" },
+        { value: "orange", text: "Orange" }
+      ],
+      form: {
+        name: null,
+        food: null
+      },
       employees : [],
       selectedEmployees : [],
+      searchForm: {
+        empId: {
+          key: 'empId',
+          text: 'Employee ID',
+          value: ''
+        },
+        empFirst: {
+          key: 'empFirst',
+          text: 'Employee First Name',
+          value: ''
+        },
+        empLast: {
+          key: 'empLast',
+          text: 'Employee First Name',
+          value: ''
+        },
+        email: {
+          key: 'email',
+          text: 'Email',
+          value: ''
+        },
+        phone: {
+          key: 'phone',
+          text: 'Phone',
+          value: ''
+        },
+        hireDate: {
+          key: 'hireDate',
+          text: 'HireDate',
+          value: ''
+        },
+        jobId: {
+          text: 'Job ID',
+          value: ''
+        },
+        salary: {
+          key: 'salary',
+          text: 'Salary $',
+          value: ''
+        },
+        commission: {
+          key: 'commission',
+          text: 'Commission (%)',
+          value: ''
+        },
+        managerFirst: {
+          key: 'managerFirst',
+          text: 'Manager First Name',
+          value: ''
+        },
+        managerLast: {
+          key: 'managerLast',
+          text: 'Manager Last Name',
+          value: ''
+        },
+        department: {
+          key: 'department',
+          text: 'Department',
+          value: ''
+        },
+      },
       fields: [
         {key:'chkAll',         label:'chkAll',          width: '10px',   filter: false, defaultWidth: '10px',  chk: false}, //2%
-        {key:'rowNum',         label:'No.',             width: '45px',   filter: false, defaultWidth: '45px',  sort: 'asc'}, //2%
+        {key:'rowNum',         label:'No.',             width: '30px',   filter: false, defaultWidth: '30px',  sort: 'asc'}, //2%
         {key:'employeeId',     label:'ID',              width: '45px',   filter: false, defaultWidth: '45px',  sort: 'asc'}, //6%
         {key:'name',           label:'Name',            width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //8%
         {key:'email',          label:'Email',           width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //8%
         {key:'phoneNumber',    label:'Phone',           width: '110px',  filter: false, defaultWidth: '110px', sort: 'asc'}, //8%
         {key:'hireDate',       label:'HireDate',        width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //10%
-        {key:'jobId',          label:'Job ID',          width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //8%
-        {key:'salary',         label:'Salary $',        width: '80px',   filter: false, defaultWidth: '80px',  sort: 'asc'}, //8%
+        {key:'jobId',          label:'Job ID',          width: '80px',   filter: false, defaultWidth: '80px',  sort: 'asc'}, //8%
+        {key:'salary',         label:'Salary $',        width: '100px',  filter: false, defaultWidth: '100px',  sort: 'asc'}, //8%
         {key:'commissionPct',  label:'Commission (%)',  width: '150px',  filter: false, defaultWidth: '150px', sort: 'asc'}, //17%
         {key:'manager',        label:'Manager',         width: '120px',  filter: false, defaultWidth: '120px', sort: 'asc'}, //10%
         {key:'departmentName', label:'Department',      width: '140px',  filter: true,  defaultWidth: '140px', sort: 'asc', filterFill: true}, //15%
@@ -338,9 +395,9 @@ export default {
   },
 
   methods: {
-
     getHREmployees(page = 1){
         this.pageObject.page = page;
+        this.selectedEmployees = [];
         this.$main.loading.show();
         return this.getHREmployeesApi(
             page
@@ -465,8 +522,8 @@ export default {
         await this.getHREmployees(1);
     },
 
-    async pagination(){
-      await this.getHREmployees(this.pageObject.page);
+    pagination(button, page){
+      this.getHREmployees(page);
     },
 
     handleNoDataOk() {
@@ -479,12 +536,13 @@ export default {
 
     handleDepOk() {
       this.selectDepColConfirm = this.selectDepCol;
-      if(this.empDepList.length ===  this.selectDepCol.length){
+      if(this.selectDepCol.length !== 0){
         this.fields[11].filterFill = true;
+        this.getHREmployees(1);
       }else{
         this.fields[11].filterFill = false;
+        this.employees = [];
       }
-      this.getHREmployees(1);
     },
 
     handleDepCancel(){
@@ -570,15 +628,26 @@ export default {
         page: page,
         perPageRow: this.pageObject.perPageRow,
         perGroupPage: this.pageObject.perGroupPage,
-        key: key,
-        value: value,
         sorting: this.sorting,
-        selectDepCol: this.selectDepCol
+        selectDepCol: this.selectDepCol,
+        employeeId: this.searchForm.empId.value,
+        firstName: this.searchForm.empFirst.value,
+        lastName: this.searchForm.empLast.value,
+        email: this.searchForm.email.value,
+        phoneNumber: this.searchForm.phone.value,
+        hireDate: this.searchForm.hireDate.value.replaceAll('-','.'),
+        jobId: this.searchForm.jobId.value,
+        salary: this.searchForm.salary.value ? this.searchForm.salary.value : -1,
+        commissionPct: this.searchForm.commission.value ? this.searchForm.commission.value * 0.01 : -1,
+        departmentName: this.searchForm.department.value,
+        managerFirstName: this.searchForm.managerFirst.value,
+        managerLastName: this.searchForm.managerLast.value,
       };
 
       _.each(this.noDataSelected, item => {
         params[item] = '1';
       });
+      console.log('qs.stringify(params, { arrayFormat: \'brackets\' }) ; ', qs.stringify(params, { arrayFormat: 'brackets' }));
 
       return this.$http.get(this.url.employeesList + '?' + qs.stringify(params, { arrayFormat: 'brackets' }))
     },
@@ -625,18 +694,17 @@ export default {
       this.fields[index].width = this.fields[index].defaultWidth;
     },
 
-    chkAll(e){
-      const checked = e.target.checked;
-      this.fields[0].chk = checked;
+    chkAll(chk){
+      this.fields[0].chk = chk;
       this.employees = _.map(this.employees, e => {
-        e.chk = checked;
+        e.chk = chk;
         return e;
       });
-      this.selectedEmployees = checked ? this.employees : [];
+      this.selectedEmployees = chk ? this.employees : [];
     },
 
-    chkOne(e, index){
-      this.employees[index].chk = e.target.checked;
+    chkOne(chk, index){
+      this.employees[index].chk = chk;
       const checkedEmps = _.filter(this.employees, e => e.chk === true);
       this.selectedEmployees = checkedEmps;
       this.fields[0].chk = checkedEmps.length === this.employees.length ? true : false;
@@ -665,6 +733,55 @@ export default {
         this.getHREmployees(1);
       }
     },
+
+    reset(){
+      this.searchForm.empId.value = '';
+      this.searchForm.empFirst.value = '';
+      this.searchForm.empLast.value = '';
+      this.searchForm.email.value = '';
+      this.searchForm.phone.value = '';
+      this.searchForm.hireDate.value = '';
+      this.searchForm.jobId.value = '';
+      this.searchForm.salary.value= '';
+      this.searchForm.commission.value = '';
+      this.searchForm.managerFirst.value = '';
+      this.searchForm.managerLast.value = '';
+      this.searchForm.department.value = '' ;
+    },
+
+    multiSearch(){
+      this.getHREmployees(1);
+      console.log('this.searchForm ; ', this.searchForm);
+    },
+
+    hireDateOK(){
+
+    },
+
+    hireDateCancel(){
+
+    },
+
+    getValidationState({ dirty, validated, valid = null }) {
+      return dirty || validated ? valid : null;
+    },
+    formInputChange(value, parentKey){
+      this.searchForm[parentKey].value = value;
+    },
+    resetForm() {
+      this.form = {
+        name: null,
+        food: null
+      };
+
+      this.$nextTick(() => {
+        this.$refs.observer.reset();
+      });
+    },
+    onSubmit() {
+      alert("Form submitted!");
+    }
+
   },
 
   watch: {
@@ -692,6 +809,9 @@ export default {
         this.allSelectDepCol = false;
       }
     },
+    getValidationState({ dirty, validated, valid = null }) {
+      return dirty || validated ? valid : null;
+    },
 
   },
 
@@ -700,8 +820,7 @@ export default {
   },
 
   updated() {
-    console.log('ddd');
-  }
+  },
 
 }
 </script>
@@ -714,6 +833,11 @@ export default {
 
   .employeeList-hover:hover{
     cursor: pointer;
+  }
+
+  .multi-search-form{
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
   }
 
   .sortActive{
@@ -739,5 +863,21 @@ export default {
     position: absolute;
     cursor: col-resize;
   }
+
+  .fa-filter-empty{
+    color: lightgray;
+  }
+
+  .fa-filter-fill{
+    color: #007BFF;
+  }
+
+  .fa-default{
+    outline: none
+  }
+  .fa-default:hover{
+    cursor: pointer;
+  }
+
 
 </style>

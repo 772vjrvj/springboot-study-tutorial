@@ -2,7 +2,7 @@
   <div class = "container employeeList-container" @mousemove="empGripMouseMove" @mouseup="empGripMouseUp">
         <div class="emp-line"></div>
         <div class="text-start fs-4 mb-4 position-relative"> Employees Multi List.</div>
-        <form class="row g-3 mb-4">
+        <form class="row pb-3 g-3 mb-4 multi-search-form">
           <div class="col-sm-2">
             <label for="empId" class="form-label">{{searchForm.empId.text}}</label>
             <input type="text" v-model="searchForm.empId.value" class="form-control" id="empId">
@@ -51,7 +51,6 @@
             <label for="department" class="form-label">{{searchForm.department.text}}</label>
             <input type="text" v-model="searchForm.department.value" class="form-control" id="department">
           </div>
-
           <div class="col-sm-1">
             <label class="form-label">&nbsp;</label>
             <b-button @click="reset" class="w-100" variant="outline-secondary">Reset</b-button>
@@ -407,10 +406,10 @@ export default {
       selectDepCol: [], // Must be an array reference!
       selectDepColConfirm: [],
       url :{
-        employeesColList: '/hr/empColList',
-        employeesDepList: '/hr/empDepList',
-        employeesList: '/hr/multiSearch/employees',
-        employeesDelete: '/hr/empDelete',
+        employeesColList: '/hr/app-main/employee/colList',
+        employeesDepList: '/hr/app-main/employee/depList',
+        employeesList: '/hr/app-main/employee/singleList',
+        employeesDelete: '/hr/app-main/employee/delete',
       },
       isBusy: false,
       sorting: '',
@@ -835,11 +834,17 @@ export default {
 <style scoped>
 
   .employeeList-container{
+    width: 1350px;
     position: relative;
   }
 
   .employeeList-hover:hover{
     cursor: pointer;
+  }
+
+  .multi-search-form{
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
   }
 
   .sortActive{

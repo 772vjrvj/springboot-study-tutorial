@@ -1,8 +1,7 @@
 <template>
   <div class = "container employeeList-container" @mousemove="empGripMouseMove" @mouseup="empGripMouseUp">
         <div class="emp-line"></div>
-        <div class="text-start fs-4 mb-4 position-relative"> Employees Single List.</div>
-
+        <div class="text-start h4 font-weight-normal mb-5 position-relative"> Employees Single List.</div>
         <div class="row justify-content-between">
           <div class="col-auto">
             <b-form-select
@@ -16,13 +15,13 @@
             >
             </b-form-select>
           </div>
-          <div class="col-auto"><span class="lh-lg">Total Row : {{this.pageObject.totalRow}}</span></div>
+          <div class="col-auto"><span>Total Row : {{this.pageObject.totalRow}}</span></div>
           <div class="col-auto">
-            <b-button class="me-1" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-delete>Delete</b-button>
-            <b-button class="me-1" squared variant="secondary">Create</b-button>
-            <b-button class="ms-4" v-b-modal.no-search variant="secondary">Etc. Search</b-button>
-            <BIconFunnel class="employeeList-hover" v-b-modal.no-search v-if="noDataSelected.length === 0 " style="font-size: 1.5rem; color: #6c757d"></BIconFunnel>
-            <BIconFunnelFill class="employeeList-hover" v-b-modal.no-search v-if="noDataSelected.length !== 0 "  style="font-size: 1.5rem; color: #6c757d"></BIconFunnelFill>
+            <b-button class="mr-1" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-single-delete>Delete</b-button>
+            <b-button class="mr-1" squared variant="secondary">Create</b-button>
+            <b-button class="ml-4 mr-2" v-b-modal.no-single-search variant="primary">Etc. Search</b-button>
+            <font-awesome-icon class="fa-filter-empty fa-default" v-if="noDataSelected.length === 0" v-b-modal.no-single-search icon="fa-solid fa-filter" />
+            <font-awesome-icon class="fa-filter-fill fa-default" v-if="noDataSelected.length !== 0" v-b-modal.no-single-search icon="fa-solid fa-filter" />
           </div>
           <div class="col-auto">
             <div class="input-group mb-3">
@@ -61,14 +60,14 @@
               <b-th v-for="(field, index) in fields" :key="index" class="emp-th" :style="{width: field.width}">
                 <template v-if="field.key !== 'chkAll'">
                   {{field.label}}
-                  <BIconSortDown   class="employeeList-hover" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" style="font-size: 0.8rem; color: #0d6efd" />
-                  <BIconSortUpAlt  class="employeeList-hover" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" style="font-size: 0.8rem; color: #0d6efd" />
-                  <BIconFunnel     class="employeeList-hover" v-if="field.filter && !field.filterFill" style="font-size: 0.8rem; color: #6c757d" v-b-modal.department-fill />
-                  <BIconFunnelFill class="employeeList-hover" v-if="field.filter && field.filterFill"  style="font-size: 0.8rem; color: #6c757d" v-b-modal.department-fill />
+                  <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" icon="fa-solid fa-arrow-down-short-wide" />
+                  <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" icon="fa-solid fa-arrow-up-wide-short" />
+                  <font-awesome-icon class="fa-filter-empty fa-default" v-if="field.filter && !field.filterFill"  v-b-modal.department-single-fill icon="fa-solid fa-filter"/>
+                  <font-awesome-icon class="fa-filter-fill fa-default" v-if="field.filter && field.filterFill"   v-b-modal.department-single-fill icon="fa-solid fa-filter"/>
                   <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
                 </template>
                 <template v-else>
-                  <b-form-checkbox @click="chkAll" :checked="field.chk" />
+                  <b-form-checkbox @change="chkAll" :checked="field.chk" />
                   <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
                 </template>
               </b-th>
@@ -78,7 +77,7 @@
             <b-tr v-for="(emps, idx) in employees" :key="idx">
               <b-td>
                 <div :style="{width: fields[0].width}">
-                  <b-form-checkbox :checked="emps['chk']" @click="chkOne($event, idx)" />
+                  <b-form-checkbox :checked="emps['chk']" @change="chkOne($event, idx)" />
                 </div>
               </b-td>
               <b-td>
@@ -164,7 +163,7 @@
                 last-text="Last"
                 :limit="pageObject.perGroupPage"
                 align="center"
-                @click="pagination"
+                @page-click="pagination"
             ></b-pagination>
           </div>
           <div class="col-auto">
@@ -184,7 +183,7 @@
           </div>
         </div>
         <b-modal
-            id="no-search"
+            id="no-single-search"
             ref="modal"
             title="Etc. Search"
             @ok="handleNoDataOk"
@@ -208,7 +207,7 @@
           </b-form-group>
         </b-modal>
         <b-modal
-            id="department-fill"
+            id="department-single-fill"
             ref="modal"
             title="Department List"
             okTitle="Filter"
@@ -234,7 +233,7 @@
           </b-form-group>
         </b-modal>
         <b-modal
-            id="emp-delete"
+            id="emp-single-delete"
             title="Delete"
             @ok="empDelete"
         >
@@ -244,7 +243,6 @@
 </template>
 
 <script>
-import {BIconFunnel, BIconFunnelFill, BIconSortDown, BIconSortUpAlt} from 'bootstrap-icons-vue'
 import _ from "lodash";
 import qs from "qs";
 
@@ -252,10 +250,7 @@ export default {
   name: 'employeeSingleList',
 
   components: {
-    BIconFunnel,
-    BIconFunnelFill,
-    BIconSortDown,
-    BIconSortUpAlt
+
   },
 
   data(){
@@ -264,14 +259,14 @@ export default {
       selectedEmployees : [],
       fields: [
         {key:'chkAll',         label:'chkAll',          width: '10px',   filter: false, defaultWidth: '10px',  chk: false}, //2%
-        {key:'rowNum',         label:'No.',             width: '45px',   filter: false, defaultWidth: '45px',  sort: 'asc'}, //2%
+        {key:'rowNum',         label:'No.',             width: '30px',   filter: false, defaultWidth: '30px',  sort: 'asc'}, //2%
         {key:'employeeId',     label:'ID',              width: '45px',   filter: false, defaultWidth: '45px',  sort: 'asc'}, //6%
         {key:'name',           label:'Name',            width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //8%
         {key:'email',          label:'Email',           width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //8%
         {key:'phoneNumber',    label:'Phone',           width: '110px',  filter: false, defaultWidth: '110px', sort: 'asc'}, //8%
         {key:'hireDate',       label:'HireDate',        width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //10%
-        {key:'jobId',          label:'Job ID',          width: '90px',   filter: false, defaultWidth: '90px',  sort: 'asc'}, //8%
-        {key:'salary',         label:'Salary $',        width: '80px',   filter: false, defaultWidth: '80px',  sort: 'asc'}, //8%
+        {key:'jobId',          label:'Job ID',          width: '80px',   filter: false, defaultWidth: '80px',  sort: 'asc'}, //8%
+        {key:'salary',         label:'Salary $',        width: '100px',  filter: false, defaultWidth: '100px',  sort: 'asc'}, //8%
         {key:'commissionPct',  label:'Commission (%)',  width: '150px',  filter: false, defaultWidth: '150px', sort: 'asc'}, //17%
         {key:'manager',        label:'Manager',         width: '120px',  filter: false, defaultWidth: '120px', sort: 'asc'}, //10%
         {key:'departmentName', label:'Department',      width: '140px',  filter: true,  defaultWidth: '140px', sort: 'asc', filterFill: true}, //15%
@@ -341,6 +336,7 @@ export default {
 
     getHREmployees(page = 1){
         this.pageObject.page = page;
+        this.selectedEmployees = [];
         this.$main.loading.show();
         return this.getHREmployeesApi(
             page
@@ -465,8 +461,8 @@ export default {
         await this.getHREmployees(1);
     },
 
-    async pagination(){
-      await this.getHREmployees(this.pageObject.page);
+    pagination(button, page){
+      this.getHREmployees(page);
     },
 
     handleNoDataOk() {
@@ -479,12 +475,13 @@ export default {
 
     handleDepOk() {
       this.selectDepColConfirm = this.selectDepCol;
-      if(this.empDepList.length ===  this.selectDepCol.length){
+      if(this.selectDepCol.length !== 0){
         this.fields[11].filterFill = true;
+        this.getHREmployees(1);
       }else{
         this.fields[11].filterFill = false;
+        this.employees = [];
       }
-      this.getHREmployees(1);
     },
 
     handleDepCancel(){
@@ -608,8 +605,8 @@ export default {
           }
         });
 
-        if(sum + width > 1050){
-          width = (1050 - sum) + 'px';
+        if(sum + width > 1250){
+          width = (1250 - sum) + 'px';
         }
         this.fields[this.thElmIndex].width = width + 'px';
 
@@ -625,18 +622,17 @@ export default {
       this.fields[index].width = this.fields[index].defaultWidth;
     },
 
-    chkAll(e){
-      const checked = e.target.checked;
-      this.fields[0].chk = checked;
+    chkAll(chk){
+      this.fields[0].chk = chk;
       this.employees = _.map(this.employees, e => {
-        e.chk = checked;
+        e.chk = chk;
         return e;
       });
-      this.selectedEmployees = checked ? this.employees : [];
+      this.selectedEmployees = chk ? this.employees : [];
     },
 
-    chkOne(e, index){
-      this.employees[index].chk = e.target.checked;
+    chkOne(chk, index){
+      this.employees[index].chk = chk;
       const checkedEmps = _.filter(this.employees, e => e.chk === true);
       this.selectedEmployees = checkedEmps;
       this.fields[0].chk = checkedEmps.length === this.employees.length ? true : false;
@@ -700,7 +696,6 @@ export default {
   },
 
   updated() {
-    console.log('ddd');
   }
 
 }
@@ -710,10 +705,6 @@ export default {
   .employeeList-container{
     width: 1350px;
     position: relative;
-  }
-
-  .employeeList-hover:hover{
-    cursor: pointer;
   }
 
   .sortActive{
@@ -739,5 +730,22 @@ export default {
     position: absolute;
     cursor: col-resize;
   }
+
+  .fa-filter-empty{
+    color: lightgray;
+  }
+
+  .fa-filter-fill{
+    color: #007BFF;
+  }
+
+  .fa-default{
+    outline: none
+  }
+  .fa-default:hover{
+    cursor: pointer;
+  }
+
+
 
 </style>

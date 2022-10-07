@@ -17,8 +17,10 @@
     "core-js": "^3.8.3",
     "lodash": "^4.17.21",
     "qs": "^6.11.0",
+    "vee-validate": "^4.6.10",
     "vue": "^3.2.37",
-    "vue-router": "^4.0.13"
+    "vue-router": "^4.0.13",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
