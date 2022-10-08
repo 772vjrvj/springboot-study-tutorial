@@ -5,24 +5,15 @@
       v-slot="validationContext"
   >
     <b-form-group id="example-input-group-1" :label="text" :label-for="text">
-      <b-form-input
-          v-if="type !== 'date'"
-          :id="text"
-          :name="text"
-          v-model="value"
-          :state="getValidationState(validationContext)"
-          :aria-describedby="`${text}-describedby`"
-          @input="handleInput"
-      ></b-form-input>
       <b-form-datepicker
-          v-else-if="type === 'date'"
+          type=""
           :id="text"
           :name="text"
           v-model="value"
           :state="getValidationState(validationContext)"
           :aria-describedby="`${text}-describedby`"
           @input="handleInput"
-      />
+      ></b-form-datepicker>
       <b-form-invalid-feedback :id="`${text}-describedby`">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
     </b-form-group>
   </validation-provider>
@@ -36,7 +27,7 @@ export default {
     parentKey: String,
     text: String,
     rules: Object,
-    type: String
+    type: String,
   },
   data() {
     return {
