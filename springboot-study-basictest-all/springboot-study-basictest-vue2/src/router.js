@@ -25,5 +25,10 @@ export default new Router({
             name: "GantTableCross",
             component: () => import(/* webpackChunkName: "about" */ './views/GantTableCross.vue')
         },
+        {
+            path: "/themeList",
+            name: "ThemeList",
+            component: () => import(/* webpackChunkName: "about" */ './views/ThemeList.vue')
+        },
     ]
 })

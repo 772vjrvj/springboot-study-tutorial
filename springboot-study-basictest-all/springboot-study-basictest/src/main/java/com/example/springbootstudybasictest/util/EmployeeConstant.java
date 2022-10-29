@@ -9,4 +9,6 @@ public class EmployeeConstant {
 
     public static final String EMPLOYEE = BASE_URI + "/employee";
 
+    public static final String THEME = BASE_URI + "/theme";
+
 }

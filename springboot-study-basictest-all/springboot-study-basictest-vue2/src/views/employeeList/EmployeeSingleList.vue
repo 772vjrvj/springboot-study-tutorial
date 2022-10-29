@@ -49,95 +49,97 @@
             </div>
           </div>
         </div>
-        <b-table-simple
-          striped
-          hover
-          bordered
-          responsive
-        >
-          <b-thead ref="empThead">
-            <b-tr>
-              <b-th v-for="(field, index) in fields" :key="index" class="emp-th" :style="{width: field.width}">
-                <template v-if="field.key !== 'chkAll'">
-                  {{field.label}}
-                  <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" icon="fa-solid fa-arrow-down-short-wide" />
-                  <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" icon="fa-solid fa-arrow-up-wide-short" />
-                  <font-awesome-icon class="fa-filter-empty fa-default" v-if="field.filter && !field.filterFill"  v-b-modal.department-single-fill icon="fa-solid fa-filter"/>
-                  <font-awesome-icon class="fa-filter-fill fa-default" v-if="field.filter && field.filterFill"   v-b-modal.department-single-fill icon="fa-solid fa-filter"/>
-                  <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
-                </template>
-                <template v-else>
-                  <b-form-checkbox @change="chkAll" :checked="field.chk" />
-                  <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
-                </template>
-              </b-th>
-            </b-tr>
-          </b-thead>
-          <b-tbody>
-            <b-tr v-for="(emps, idx) in employees" :key="idx">
-              <b-td>
-                <div :style="{width: fields[0].width}">
-                  <b-form-checkbox :checked="emps['chk']" @change="chkOne($event, idx)" />
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['rowNum']" :style="{width: fields[1].width}">
-                  {{emps['rowNum']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['employeeId']" :style="{width: fields[2].width}">
-                  {{emps['employeeId']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['firstName'] +' ' + emps['lastName']" :style="{width: fields[3].width}">
-                  {{emps['firstName'] +' ' + emps['lastName']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['email']" :style="{width: fields[4].width}">
-                  {{emps['email']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['phoneNumber']" :style="{width: fields[5].width}">
-                  {{emps['phoneNumber']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['hireDate']" :style="{width: fields[6].width}">
-                  {{emps['hireDate']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['jobId']" :style="{width: fields[7].width}">
-                  {{emps['jobId']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['salary'] === -1 ? 0 : emps['salary']" :style="{width: fields[8].width, textAlign: 'right'}">
-                  {{ emps['salary'] === -1 ? 0 : emps['salary'] }}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100" :style="{width: fields[9].width}">
-                  {{ emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100  }}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['managerFirstName'] + ' ' + emps['managerLastName']" :style="{width: fields[10].width}">
-                  {{emps['managerFirstName'] + ' ' + emps['managerLastName']}}
-                </div>
-              </b-td>
-              <b-td>
-                <div class="emp-ellipsis"  v-b-tooltip.hover :title="emps['departmentName']" :style="{width: fields[11].width}">
-                  {{emps['departmentName']}}
-                </div>
-              </b-td>
-            </b-tr>
-          </b-tbody>
-        </b-table-simple>
+        <div class="row justify-content-center">
+          <b-table-simple
+            striped
+            hover
+            bordered
+            responsive
+          >
+            <b-thead ref="empThead">
+              <b-tr>
+                <b-th v-for="(field, index) in fields" :key="index" class="emp-th" :style="{width: field.width}">
+                  <template v-if="field.key !== 'chkAll'">
+                    {{field.label}}
+                    <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" icon="fa-solid fa-arrow-down-short-wide" />
+                    <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" icon="fa-solid fa-arrow-up-wide-short" />
+                    <font-awesome-icon class="fa-filter-empty fa-default" v-if="field.filter && !field.filterFill"  v-b-modal.department-single-fill icon="fa-solid fa-filter"/>
+                    <font-awesome-icon class="fa-filter-fill fa-default" v-if="field.filter && field.filterFill"   v-b-modal.department-single-fill icon="fa-solid fa-filter"/>
+                    <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
+                  </template>
+                  <template v-else>
+                    <b-form-checkbox @change="chkAll" :checked="field.chk" />
+                    <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
+                  </template>
+                </b-th>
+              </b-tr>
+            </b-thead>
+            <b-tbody>
+              <b-tr v-for="(emps, idx) in employees" :key="idx">
+                <b-td>
+                  <div :style="{width: fields[0].width}">
+                    <b-form-checkbox :checked="emps['chk']" @change="chkOne($event, idx)" />
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['rowNum']" :style="{width: fields[1].width}">
+                    {{emps['rowNum']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['employeeId']" :style="{width: fields[2].width}">
+                    {{emps['employeeId']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['firstName'] +' ' + emps['lastName']" :style="{width: fields[3].width}">
+                    {{emps['firstName'] +' ' + emps['lastName']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['email']" :style="{width: fields[4].width}">
+                    {{emps['email']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['phoneNumber']" :style="{width: fields[5].width}">
+                    {{emps['phoneNumber']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['hireDate']" :style="{width: fields[6].width}">
+                    {{emps['hireDate']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['jobId']" :style="{width: fields[7].width}">
+                    {{emps['jobId']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['salary'] === -1 ? 0 : emps['salary']" :style="{width: fields[8].width, textAlign: 'right'}">
+                    {{ emps['salary'] === -1 ? 0 : emps['salary'] }}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100" :style="{width: fields[9].width}">
+                    {{ emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100  }}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['managerFirstName'] + ' ' + emps['managerLastName']" :style="{width: fields[10].width}">
+                    {{emps['managerFirstName'] + ' ' + emps['managerLastName']}}
+                  </div>
+                </b-td>
+                <b-td>
+                  <div class="emp-ellipsis"  v-b-tooltip.hover :title="emps['departmentName']" :style="{width: fields[11].width}">
+                    {{emps['departmentName']}}
+                  </div>
+                </b-td>
+              </b-tr>
+            </b-tbody>
+          </b-table-simple>
+        </div>
         <div class="row justify-content-center">
           <div class="col-auto">
             <b-form-select
@@ -239,7 +241,7 @@
         >
           <p class="my-4">Do you want to delete?</p>
         </b-modal>
-      </div>
+  </div>
 </template>
 
 <script>

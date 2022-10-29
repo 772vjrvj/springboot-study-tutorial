@@ -1,249 +1,249 @@
 <template>
   <div class = "container employeeList-container" @mousemove="empGripMouseMove" @mouseup="empGripMouseUp">
-        <div class="row justify-content-start">
-          <div class="text-start h4 font-weight-normal mb-5 position-relative"> Employees Multi List.</div>
-        </div>
-        <div class="row justify-content-start mb-3">
-            <div>
-              <b-button v-b-toggle.collapse-2 class="mb-1">MultiSearch</b-button>
-            </div>
-            <b-collapse id="collapse-2">
-              <b-card>
-                <validation-observer ref="observer" v-slot="{ handleSubmit }">
-                  <b-form class="pt-2 pb-2 mb-2 row g-3 multi-search-form" @submit.stop.prevent="handleSubmit(onSubmit)">
-                    <div v-for="(v,i) in searchForm" class="col-sm-4" :key="i">
-                      <formValidInput
-                          @formInputChange="formInputChange"
-                          :text="v.text"
-                          :parentKey="v.key"
-                          :type="v.type"
-                          :rules="{ required: true, min: 3 }"
-                      />
-                    </div>
-                    <div class="col-sm-2">
-                      <b-button type="submit" variant="primary">Submit</b-button>
-                      <b-button class="ml-2" @click="resetForm()">Reset</b-button>
-                    </div>
-                  </b-form>
-                </validation-observer>
-              </b-card>
-            </b-collapse>
-        </div>
-        <div class="row justify-content-start">
-          <div class="col-auto">
-            <b-form-select
-                @change="selectRowChange"
-                id="inline-form-custom-select-pref"
-                class="mb-2 ms-2"
-                :options="rowCountList"
-                v-model="pageObject.perPageRow"
-                value-field="item"
-                text-field="name"
-            >
-            </b-form-select>
-          </div>
-          <div class="col-auto"><span>Total Row : {{this.pageObject.totalRow}}</span></div>
-          <div class="col-auto">
-            <b-button class="mr-1" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-delete>Delete</b-button>
-            <b-button class="mr-1" squared variant="secondary">Create</b-button>
-            <b-button class="ml-4 mr-2" v-b-modal.no-multi-search variant="secondary">Etc. Search</b-button>
-            <font-awesome-icon class="fa-filter-empty fa-default" v-if="noDataSelected.length === 0" v-b-modal.no-multi-search icon="fa-solid fa-filter" />
-            <font-awesome-icon class="fa-filter-fill fa-default" v-if="noDataSelected.length !== 0" v-b-modal.no-multi-search icon="fa-solid fa-filter" />
-          </div>
-        </div>
-        <div class="row justify-content-start emp-multi-table">
-          <b-table-simple
-            striped
-            hover
-            bordered
-            responsive
-          >
-            <b-thead ref="empThead">
-              <b-tr>
-                <b-th v-for="(field, index) in fields" :key="index" class="emp-th" :style="{width: field.width}">
-                  <template v-if="field.key !== 'chkAll'">
-                    {{field.label}}
-                    <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" icon="fa-solid fa-arrow-down-short-wide" />
-                    <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" icon="fa-solid fa-arrow-up-wide-short" />
-                    <font-awesome-icon class="fa-filter-empty fa-default" v-if="field.filter && !field.filterFill"  v-b-modal.department-multi-fill icon="fa-solid fa-filter"/>
-                    <font-awesome-icon class="fa-filter-fill fa-default" v-if="field.filter && field.filterFill"   v-b-modal.department-multi-fill icon="fa-solid fa-filter"/>
-                    <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
-                  </template>
-                  <template v-else>
-                    <b-form-checkbox @change="chkAll" :checked="field.chk" />
-                    <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
-                  </template>
-                </b-th>
-              </b-tr>
-            </b-thead>
-            <b-tbody>
-              <b-tr v-for="(emps, idx) in employees" :key="idx">
-                <b-td>
-                  <div :style="{width: fields[0].width}">
-                    <b-form-checkbox :checked="emps['chk']" @change="chkOne($event, idx)" />
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['rowNum']" :style="{width: fields[1].width}">
-                    {{emps['rowNum']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['employeeId']" :style="{width: fields[2].width}">
-                    {{emps['employeeId']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['firstName'] +' ' + emps['lastName']" :style="{width: fields[3].width}">
-                    {{emps['firstName'] +' ' + emps['lastName']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['email']" :style="{width: fields[4].width}">
-                    {{emps['email']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['phoneNumber']" :style="{width: fields[5].width}">
-                    {{emps['phoneNumber']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['hireDate']" :style="{width: fields[6].width}">
-                    {{emps['hireDate']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['jobId']" :style="{width: fields[7].width}">
-                    {{emps['jobId']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['salary'] === -1 ? 0 : emps['salary']" :style="{width: fields[8].width, textAlign: 'right'}">
-                    {{ emps['salary'] === -1 ? 0 : emps['salary'] }}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100" :style="{width: fields[9].width}">
-                    {{ emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100  }}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['managerFirstName'] + ' ' + emps['managerLastName']" :style="{width: fields[10].width}">
-                    {{emps['managerFirstName'] + ' ' + emps['managerLastName']}}
-                  </div>
-                </b-td>
-                <b-td>
-                  <div class="emp-ellipsis"  v-b-tooltip.hover :title="emps['departmentName']" :style="{width: fields[11].width}">
-                    {{emps['departmentName']}}
-                  </div>
-                </b-td>
-              </b-tr>
-            </b-tbody>
-          </b-table-simple>
-        </div>
-        <div class="row justify-content-start">
-          <div class="col-auto">
-            <b-form-select
-                @change="selectPageChange"
-                id="inline-form-custom-select-pref"
-                class="mb-2 mr-sm-2 mb-sm-0"
-                :options="pageCountList"
-                v-model="selectedPerPage"
-                value-field="item"
-                text-field="name"
-            >
-            </b-form-select>
-          </div>
-          <div class="col-auto">
-            <b-pagination
-                v-model="pageObject.page"
-                :total-rows="pageObject.totalRow"
-                :per-page="pageObject.perPageRow"
-                aria-controls="my-table"
-                first-text="First"
-                prev-text="Prev"
-                next-text="Next"
-                last-text="Last"
-                :limit="pageObject.perGroupPage"
-                align="center"
-                @page-click="pagination"
-            ></b-pagination>
-          </div>
-          <div class="col-auto">
-            <div class="input-group mb-3">
-              <b-form-input
-                  :style="{width: '70px'}"
-                  v-model="inputPage"
-                  type="text"
-                  placeholder="Page"
-                  @keyup.enter="onInputPage"
-              ></b-form-input>
-              <b-button
-                  @click="onInputPage"
-                  variant="secondary"
-              >Go</b-button>
-            </div>
-          </div>
-        </div>
-        <b-modal
-            id="no-multi-search"
-            ref="modal"
-            title="Etc. Search"
-            @ok="handleNoDataOk"
-            @cancel="handleNoDataCancel"
-        >
-          <b-form-group label="Contain No Data" >
-            <b-form-checkbox
-                v-model="allNoDataSelected"
-                :indeterminate="noDataIndeterminate"
-                @change="noDataToggleAll"
-            >
-              {{ 'Select All' }}
-            </b-form-checkbox>
-            <b-form-checkbox-group
-                id="noDataSelected"
-                v-model="noDataSelected"
-                :options="noDataOptions"
-                name="noDataSelected"
-                stacked
-            ></b-form-checkbox-group>
-          </b-form-group>
-        </b-modal>
-        <b-modal
-            id="department-multi-fill"
-            ref="modal"
-            title="Department List"
-            okTitle="Filter"
-            scrollable
-            @ok="handleDepOk"
-            @cancel="handleDepCancel"
-        >
-          <b-form-group>
-            <b-form-checkbox
-                v-model="allSelectDepCol"
-                :indeterminate="depColIndeterminate"
-                @change="depColToggleAll"
-            >
-              {{ 'Select All' }}
-            </b-form-checkbox>
-            <b-form-checkbox-group
-                id="empDepList"
-                v-model="selectDepCol"
-                :options="empDepList"
-                name="empDepList"
-                stacked
-            ></b-form-checkbox-group>
-          </b-form-group>
-        </b-modal>
-        <b-modal
-            id="emp-delete"
-            title="Delete"
-            @ok="empDelete"
-        >
-          <p class="my-4">Do you want to delete?</p>
-        </b-modal>
+    <div class="row justify-content-start">
+      <div class="text-start h4 font-weight-normal mb-5 position-relative"> Employees Multi List.</div>
+    </div>
+    <div class="row justify-content-start mb-3">
+      <div>
+        <b-button v-b-toggle.collapse-2 class="mb-1">MultiSearch</b-button>
       </div>
+      <b-collapse id="collapse-2">
+        <b-card>
+          <validation-observer ref="observer" v-slot="{ handleSubmit }">
+            <b-form class="pt-2 pb-2 mb-2 row g-3 multi-search-form" @submit.stop.prevent="handleSubmit(onSubmit)">
+              <div v-for="(v,i) in searchForm" class="col-sm-3" :key="i">
+                <formValidInput
+                    @formInputChange="formInputChange"
+                    :text="v.text"
+                    :parentKey="v.key"
+                    :type="v.type"
+                    :rules="{ required: true, min: 3 }"
+                />
+              </div>
+              <div class="col-sm-2">
+                <b-button type="submit" variant="primary">Submit</b-button>
+                <b-button class="ml-2" @click="resetForm()">Reset</b-button>
+              </div>
+            </b-form>
+          </validation-observer>
+        </b-card>
+      </b-collapse>
+    </div>
+    <div class="row justify-content-start">
+      <div class="col-auto">
+        <b-form-select
+            @change="selectRowChange"
+            id="inline-form-custom-select-pref"
+            class="mb-2 ms-2"
+            :options="rowCountList"
+            v-model="pageObject.perPageRow"
+            value-field="item"
+            text-field="name"
+        >
+        </b-form-select>
+      </div>
+      <div class="col-auto"><span>Total Row : {{this.pageObject.totalRow}}</span></div>
+      <div class="col-auto">
+        <b-button class="mr-1" squared variant="secondary" :disabled="selectedEmployees.length === 0"  v-b-modal.emp-delete>Delete</b-button>
+        <b-button class="mr-1" squared variant="secondary">Create</b-button>
+        <b-button class="ml-4 mr-2" v-b-modal.no-multi-search variant="secondary">Etc. Search</b-button>
+        <font-awesome-icon class="fa-filter-empty fa-default" v-if="noDataSelected.length === 0" v-b-modal.no-multi-search icon="fa-solid fa-filter" />
+        <font-awesome-icon class="fa-filter-fill fa-default" v-if="noDataSelected.length !== 0" v-b-modal.no-multi-search icon="fa-solid fa-filter" />
+      </div>
+    </div>
+    <div class="row justify-content-center emp-multi-table">
+      <b-table-simple
+        striped
+        hover
+        bordered
+        responsive
+      >
+        <b-thead ref="empThead">
+          <b-tr>
+            <b-th v-for="(field, index) in fields" :key="index" class="emp-th" :style="{width: field.width}">
+              <template v-if="field.key !== 'chkAll'">
+                {{field.label}}
+                <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'desc'" @click="sortingEmploy(field)" icon="fa-solid fa-arrow-down-short-wide" />
+                <font-awesome-icon class="fa-default" :class="{'sortActive':field.key === sortingKey}"  v-if="field.key !== 'rowNum' && field.sort === 'asc'"  @click="sortingEmploy(field)" icon="fa-solid fa-arrow-up-wide-short" />
+                <font-awesome-icon class="fa-filter-empty fa-default" v-if="field.filter && !field.filterFill"  v-b-modal.department-multi-fill icon="fa-solid fa-filter"/>
+                <font-awesome-icon class="fa-filter-fill fa-default" v-if="field.filter && field.filterFill"   v-b-modal.department-multi-fill icon="fa-solid fa-filter"/>
+                <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
+              </template>
+              <template v-else>
+                <b-form-checkbox @change="chkAll" :checked="field.chk" />
+                <div class="emp-grip" @mousedown="empGripMouseDown($event, index)" @dblclick="empGripDbClick(index)"></div>
+              </template>
+            </b-th>
+          </b-tr>
+        </b-thead>
+        <b-tbody>
+          <b-tr v-for="(emps, idx) in employees" :key="idx">
+            <b-td>
+              <div :style="{width: fields[0].width}">
+                <b-form-checkbox :checked="emps['chk']" @change="chkOne($event, idx)" />
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['rowNum']" :style="{width: fields[1].width}">
+                {{emps['rowNum']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['employeeId']" :style="{width: fields[2].width}">
+                {{emps['employeeId']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['firstName'] +' ' + emps['lastName']" :style="{width: fields[3].width}">
+                {{emps['firstName'] +' ' + emps['lastName']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['email']" :style="{width: fields[4].width}">
+                {{emps['email']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['phoneNumber']" :style="{width: fields[5].width}">
+                {{emps['phoneNumber']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['hireDate']" :style="{width: fields[6].width}">
+                {{emps['hireDate']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['jobId']" :style="{width: fields[7].width}">
+                {{emps['jobId']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['salary'] === -1 ? 0 : emps['salary']" :style="{width: fields[8].width, textAlign: 'right'}">
+                {{ emps['salary'] === -1 ? 0 : emps['salary'] }}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100" :style="{width: fields[9].width}">
+                {{ emps['commissionPct'] === -1 ? '-' : emps['commissionPct'] * 100  }}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis" v-b-tooltip.hover :title="emps['managerFirstName'] + ' ' + emps['managerLastName']" :style="{width: fields[10].width}">
+                {{emps['managerFirstName'] + ' ' + emps['managerLastName']}}
+              </div>
+            </b-td>
+            <b-td>
+              <div class="emp-ellipsis"  v-b-tooltip.hover :title="emps['departmentName']" :style="{width: fields[11].width}">
+                {{emps['departmentName']}}
+              </div>
+            </b-td>
+          </b-tr>
+        </b-tbody>
+      </b-table-simple>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-auto">
+        <b-form-select
+            @change="selectPageChange"
+            id="inline-form-custom-select-pref"
+            class="mb-2 mr-sm-2 mb-sm-0"
+            :options="pageCountList"
+            v-model="selectedPerPage"
+            value-field="item"
+            text-field="name"
+        >
+        </b-form-select>
+      </div>
+      <div class="col-auto">
+        <b-pagination
+            v-model="pageObject.page"
+            :total-rows="pageObject.totalRow"
+            :per-page="pageObject.perPageRow"
+            aria-controls="my-table"
+            first-text="First"
+            prev-text="Prev"
+            next-text="Next"
+            last-text="Last"
+            :limit="pageObject.perGroupPage"
+            align="center"
+            @page-click="pagination"
+        ></b-pagination>
+      </div>
+      <div class="col-auto">
+        <div class="input-group mb-3">
+          <b-form-input
+              :style="{width: '70px'}"
+              v-model="inputPage"
+              type="text"
+              placeholder="Page"
+              @keyup.enter="onInputPage"
+          ></b-form-input>
+          <b-button
+              @click="onInputPage"
+              variant="secondary"
+          >Go</b-button>
+        </div>
+      </div>
+    </div>
+    <b-modal
+        id="no-multi-search"
+        ref="modal"
+        title="Etc. Search"
+        @ok="handleNoDataOk"
+        @cancel="handleNoDataCancel"
+    >
+      <b-form-group label="Contain No Data" >
+        <b-form-checkbox
+            v-model="allNoDataSelected"
+            :indeterminate="noDataIndeterminate"
+            @change="noDataToggleAll"
+        >
+          {{ 'Select All' }}
+        </b-form-checkbox>
+        <b-form-checkbox-group
+            id="noDataSelected"
+            v-model="noDataSelected"
+            :options="noDataOptions"
+            name="noDataSelected"
+            stacked
+        ></b-form-checkbox-group>
+      </b-form-group>
+    </b-modal>
+    <b-modal
+        id="department-multi-fill"
+        ref="modal"
+        title="Department List"
+        okTitle="Filter"
+        scrollable
+        @ok="handleDepOk"
+        @cancel="handleDepCancel"
+    >
+      <b-form-group>
+        <b-form-checkbox
+            v-model="allSelectDepCol"
+            :indeterminate="depColIndeterminate"
+            @change="depColToggleAll"
+        >
+          {{ 'Select All' }}
+        </b-form-checkbox>
+        <b-form-checkbox-group
+            id="empDepList"
+            v-model="selectDepCol"
+            :options="empDepList"
+            name="empDepList"
+            stacked
+        ></b-form-checkbox-group>
+      </b-form-group>
+    </b-modal>
+    <b-modal
+        id="emp-delete"
+        title="Delete"
+        @ok="empDelete"
+    >
+      <p class="my-4">Do you want to delete?</p>
+    </b-modal>
+  </div>
 </template>
 
 <script>
